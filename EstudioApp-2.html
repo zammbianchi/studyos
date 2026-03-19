@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" data-app="none">
+<head>
+<meta charset="UTF-8">
+<meta name="theme-color" content="#080810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="StudyOS">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="data:application/json;charset=utf-8,{
+  &quot;name&quot;: &quot;StudyOS&quot;,
+  &quot;short_name&quot;: &quot;StudyOS&quot;,
+  &quot;description&quot;: &quot;Tu plataforma de estudio personal — DSDM y Ruby&quot;,
+  &quot;start_url&quot;: &quot;.&quot;,
+  &quot;display&quot;: &quot;standalone&quot;,
+  &quot;background_color&quot;: &quot;#080810&quot;,
+  &quot;theme_color&quot;: &quot;#080810&quot;,
+  &quot;orientation&quot;: &quot;portrait&quot;,
+  &quot;icons&quot;: [{
+    &quot;src&quot;: &quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23080810'/%3E%3Ctext y='320' x='256' text-anchor='middle' font-size='300' font-family='Arial'%3E📘%3C/text%3E%3C/svg%3E&quot;,
+    &quot;sizes&quot;: &quot;512x512&quot;,
+    &quot;type&quot;: &quot;image/svg+xml&quot;,
+    &quot;purpose&quot;: &quot;any maskable&quot;
+  }]
+}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>StudyOS — DSDM & Ruby</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ══ VARIABLES ══════════════════════════════════════════════════ */
+:root{
+  --bg:#080810;--bg2:#0f0f1a;--bg3:#161625;--bg4:#1e1e30;
+  --border:#252535;--text:#eeeef8;--text-dim:#7777aa;
+  --input-bg:#161625;--shadow:rgba(0,0,0,0.7);
+  --dsdm:#4d9fff;--dsdm2:#c47aff;--dsdm3:#4dffd6;
+  --ruby:#ff5555;--ruby2:#ff8c4d;--ruby3:#ffd700;
+  --gold:#ffd700;--success:#4dff9f;--error:#ff4d7a;
+}
+[data-theme="light"]{
+  --bg:#f0f0f8;--bg2:#ffffff;--bg3:#e8e8f5;--bg4:#ddddf0;
+  --border:#ccccdd;--text:#111122;--text-dim:#666688;
+  --input-bg:#e8e8f5;--shadow:rgba(0,0,0,0.15);
+}
+
+/* ══ RESET ══════════════════════════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;transition:background .3s,color .3s}
+
+/* ══ SPLASH ═════════════════════════════════════════════════════ */
+#splash{
+  position:fixed;inset:0;z-index:99999;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;padding:2rem;
+  transition:opacity .6s ease,transform .6s ease;
+}
+#splash.out{opacity:0;transform:scale(1.05);pointer-events:none}
+.sp-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(77,159,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(77,159,255,.04) 1px,transparent 1px);background-size:50px 50px}
+.sp-glow1{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(77,159,255,.08) 0%,transparent 70%);top:-100px;right:-100px;animation:glowFloat 6s ease-in-out infinite}
+.sp-glow2{position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(255,85,85,.06) 0%,transparent 70%);bottom:-80px;left:-80px;animation:glowFloat 8s ease-in-out infinite reverse}
+@keyframes glowFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-20px)}}
+
+.sp-logo{position:relative;text-align:center;margin-bottom:3rem}
+.sp-logo-main{font-family:'Syne',sans-serif;font-size:clamp(3rem,10vw,6rem);font-weight:800;line-height:1;letter-spacing:-.03em;opacity:0;animation:fadeUp .8s ease .3s forwards}
+.sp-logo-main span.d{background:linear-gradient(135deg,#4d9fff,#c47aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sp-logo-main span.r{background:linear-gradient(135deg,#ff5555,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sp-logo-sub{font-family:'Space Mono',monospace;font-size:clamp(.65rem,2vw,.85rem);color:var(--text-dim);letter-spacing:.2em;margin-top:.75rem;opacity:0;animation:fadeUp .8s ease .7s forwards}
+.sp-tagline{font-size:clamp(.85rem,2.5vw,1.1rem);color:var(--text-dim);margin-bottom:3rem;opacity:0;animation:fadeUp .8s ease 1s forwards;text-align:center;line-height:1.6}
+
+.sp-cards{display:flex;gap:1.25rem;flex-wrap:wrap;justify-content:center;opacity:0;animation:fadeUp .8s ease 1.3s forwards}
+.sp-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:20px;
+  padding:2rem 1.75rem;cursor:pointer;transition:all .3s;
+  width:min(220px,calc(50vw - 2rem));text-align:center;position:relative;overflow:hidden;
+}
+.sp-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;border-radius:20px}
+.sp-card:hover{transform:translateY(-6px)}
+.sp-card:hover::before{opacity:1}
+.sp-card:active{transform:scale(.97)}
+.sp-card.dsdm::before{background:linear-gradient(135deg,rgba(77,159,255,.08),rgba(196,122,255,.08))}
+.sp-card.dsdm{border-color:rgba(77,159,255,.2)}
+.sp-card.dsdm:hover{border-color:rgba(77,159,255,.5);box-shadow:0 20px 60px rgba(77,159,255,.15)}
+.sp-card.ruby::before{background:linear-gradient(135deg,rgba(255,85,85,.08),rgba(255,215,0,.08))}
+.sp-card.ruby{border-color:rgba(255,85,85,.2)}
+.sp-card.ruby:hover{border-color:rgba(255,85,85,.5);box-shadow:0 20px 60px rgba(255,85,85,.15)}
+.sp-card-icon{font-size:3rem;margin-bottom:1rem;display:block}
+.sp-card-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;margin-bottom:.4rem}
+.sp-card.dsdm .sp-card-title{background:linear-gradient(135deg,#4d9fff,#c47aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sp-card.ruby .sp-card-title{background:linear-gradient(135deg,#ff5555,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.sp-card-desc{font-size:.8rem;color:var(--text-dim);line-height:1.5}
+.sp-card-tags{margin-top:.875rem;display:flex;gap:.3rem;flex-wrap:wrap;justify-content:center}
+.sp-card-tag{font-family:'Space Mono',monospace;font-size:.6rem;padding:.15rem .45rem;border-radius:5px}
+.sp-card.dsdm .sp-card-tag{background:rgba(77,159,255,.12);color:#4d9fff}
+.sp-card.ruby .sp-card-tag{background:rgba(255,85,85,.12);color:#ff5555}
+
+.sp-version{position:absolute;bottom:1.5rem;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text-dim);opacity:0;animation:fadeUp .8s ease 1.6s forwards}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+/* ══ APP WRAPPER ════════════════════════════════════════════════ */
+#app{
+  position:fixed;inset:0;display:none;flex-direction:column;
+  opacity:0;transition:opacity .4s ease;
+}
+#app.visible{opacity:1}
+
+/* ══ TOP BAR ════════════════════════════════════════════════════ */
+.topbar{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.6rem 1rem;border-bottom:1px solid var(--border);
+  background:var(--bg);flex-shrink:0;position:relative;z-index:50;
+}
+.topbar-back{background:none;border:1px solid var(--border);border-radius:8px;padding:.3rem .6rem;cursor:pointer;color:var(--text-dim);font-size:.85rem;transition:all .2s}
+.topbar-back:hover{border-color:var(--text);color:var(--text)}
+.topbar-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800}
+.topbar-actions{margin-left:auto;display:flex;gap:.4rem}
+.tb-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.3rem .55rem;cursor:pointer;font-size:.8rem;color:var(--text);transition:all .2s}
+.tb-btn:hover{border-color:var(--text-dim)}
+
+/* ══ NAV TABS ═══════════════════════════════════════════════════ */
+.nav-tabs{
+  display:flex;overflow-x:auto;scrollbar-width:none;
+  border-bottom:1px solid var(--border);background:var(--bg);
+  flex-shrink:0;
+}
+.nav-tabs::-webkit-scrollbar{display:none}
+.nav-tab{
+  background:none;border:none;color:var(--text-dim);
+  font-family:'Space Mono',monospace;font-size:.65rem;
+  padding:.7rem .85rem;cursor:pointer;white-space:nowrap;
+  border-bottom:2px solid transparent;transition:all .2s;
+  letter-spacing:.02em;flex-shrink:0;
+}
+.nav-tab:hover{color:var(--text)}
+.nav-tab.active{color:var(--text);border-bottom-color:var(--accent)}
+
+/* ══ CONTENT AREA ═══════════════════════════════════════════════ */
+.content-area{flex:1;overflow-y:auto;padding:1.25rem 1rem 5rem;position:relative}
+.section-panel{display:none;animation:fadeUp .25s ease}
+.section-panel.active{display:block}
+
+/* ══ SEARCH ═════════════════════════════════════════════════════ */
+.search-wrap{position:relative;margin-bottom:1rem}
+.search-inp{width:100%;padding:.65rem 1rem .65rem 2.2rem;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.875rem;outline:none;transition:border-color .2s}
+.search-inp:focus{border-color:var(--accent)}
+.search-inp::placeholder{color:var(--text-dim)}
+.search-ico{position:absolute;left:.7rem;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:.85rem;pointer-events:none}
+.search-res{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:200;background:var(--bg2);border:1px solid var(--border);border-radius:10px;max-height:260px;overflow-y:auto;display:none;box-shadow:0 8px 30px var(--shadow)}
+.search-res.show{display:block}
+.sri{padding:.65rem .875rem;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
+.sri:last-child{border-bottom:none}
+.sri:hover{background:var(--bg3)}
+.sri-tag{font-family:'Space Mono',monospace;font-size:.63rem;color:var(--text-dim)}
+.sri-title{font-weight:600;font-size:.825rem;margin:.1rem 0}
+.sri-prev{font-size:.75rem;color:var(--text-dim)}
+.hm{background:rgba(255,215,0,.3);border-radius:2px;padding:0 2px}
+
+/* ══ CARDS & LAYOUT ═════════════════════════════════════════════ */
+.grid{display:grid;gap:.75rem;margin:.875rem 0}
+.g2{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px var(--shadow)}
+.ct{font-family:'Space Mono',monospace;font-size:.68rem;font-weight:700;letter-spacing:.04em;margin-bottom:.5rem;text-transform:uppercase}
+.card p{font-size:.85rem;color:var(--text-dim);line-height:1.6}
+.card strong{color:var(--text)}
+.hl{border-left:3px solid var(--accent);padding:.8rem 1rem;border-radius:0 8px 8px 0;margin:.75rem 0;font-size:.875rem;line-height:1.6;background:var(--accent-bg)}
+.yo{background:rgba(77,255,214,.05);border:1px solid rgba(77,255,214,.15);border-left:3px solid #4dffd6;border-radius:0 8px 8px 0;padding:.65rem 1rem;margin:.5rem 0;font-size:.825rem}
+.yo::before{content:'💬 Yo dije: ';font-family:'Space Mono',monospace;font-size:.65rem;color:#4dffd6;font-weight:700;display:block;margin-bottom:.2rem}
+.yo p{color:var(--text);font-style:italic}
+.sn{background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:8px;padding:.65rem 1rem;margin:.75rem 0;font-size:.85rem;color:var(--gold)}
+.stitle{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin:1.5rem 0 .75rem;display:flex;align-items:center;gap:.5rem;color:var(--accent)}
+.stitle::after{content:'';flex:1;height:1px;background:var(--border)}
+.bh{display:flex;align-items:center;gap:.875rem;margin-bottom:1.25rem;padding:1.1rem;border-radius:12px;border:1px solid}
+.bn{font-family:'Space Mono',monospace;font-size:1.8rem;font-weight:700;line-height:1;opacity:.2}
+.bt{font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700}
+.bs{color:var(--text-dim);font-size:.78rem;margin-top:.2rem}
+.sb-btn{margin-left:auto;background:none;border:1px solid var(--border);border-radius:8px;padding:.35rem .65rem;cursor:pointer;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text-dim);transition:all .2s;white-space:nowrap}
+.sb-btn.done{border-color:var(--success);color:var(--success);background:rgba(77,255,159,.08)}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto;margin:.75rem 0;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead{background:var(--bg3)}
+th{padding:.65rem .8rem;text-align:left;font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.04em;color:var(--text-dim);border-bottom:1px solid var(--border)}
+td{padding:.65rem .8rem;border-bottom:1px solid rgba(128,128,180,.05);color:var(--text-dim);line-height:1.5}
+td strong{color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(128,128,180,.03)}
+
+/* ── CODE ── */
+.cb{background:#0a0d14;border:1px solid #1e2535;border-radius:10px;padding:.875rem 1rem;font-family:'Space Mono',monospace;font-size:.75rem;line-height:1.8;color:#a8b8d8;overflow-x:auto;margin:.75rem 0}
+.kw{color:#79b8ff;font-weight:700}
+.cm{color:#546e7a}
+.str{color:#9ecbff}
+
+/* ══ HOME GRID ══════════════════════════════════════════════════ */
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem;margin-top:1rem}
+.hc{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.1rem;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.hc:hover{transform:translateY(-3px);box-shadow:0 12px 30px var(--shadow)}
+.hc:active{transform:scale(.97)}
+.hcn{font-family:'Space Mono',monospace;font-size:.65rem;letter-spacing:.1em;margin-bottom:.5rem;opacity:.65}
+.hct{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;margin-bottom:.3rem}
+.hcd{font-size:.75rem;color:var(--text-dim);line-height:1.4}
+.hctags{margin-top:.65rem}
+.tag{display:inline-block;font-family:'Space Mono',monospace;font-size:.58rem;padding:.1rem .4rem;border-radius:4px;margin-right:.25rem;margin-bottom:.2rem}
+.pb{width:100%;height:2px;background:var(--border);border-radius:2px;margin-top:.65rem}
+.pf{height:100%;border-radius:2px;transition:width .5s}
+
+/* ══ PROGRESS ═══════════════════════════════════════════════════ */
+.pov{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-bottom:1.1rem}
+.pov h3{font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;margin-bottom:.875rem}
+.pi{display:flex;align-items:center;gap:.6rem;margin-bottom:.35rem}
+.pl{font-family:'Space Mono',monospace;font-size:.63rem;color:var(--text-dim);width:100px;flex-shrink:0}
+.pbar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.pfill{height:100%;border-radius:3px;transition:width .5s}
+.pcheck{font-size:.72rem;width:18px;text-align:center}
+
+/* ══ QUIZ ════════════════════════════════════════════════════════ */
+.qq{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.1rem;margin:.75rem 0}
+.qt{font-size:.9rem;font-weight:500;margin-bottom:.75rem;line-height:1.5}
+.qn{font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text-dim);margin-bottom:.3rem}
+.opts{display:flex;flex-direction:column;gap:.35rem}
+.opt{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.6rem .8rem;cursor:pointer;font-size:.825rem;transition:all .2s;text-align:left;color:var(--text-dim);font-family:'Inter',sans-serif}
+.opt:hover:not(:disabled){border-color:var(--text-dim);color:var(--text)}
+.opt.correct{border-color:var(--success);background:rgba(77,255,159,.08);color:var(--success)}
+.opt.wrong{border-color:var(--error);background:rgba(255,77,122,.08);color:var(--error)}
+.opt.sc{border-color:var(--success);background:rgba(77,255,159,.05);color:var(--success)}
+.opt:disabled{cursor:default}
+.qfb{margin-top:.5rem;padding:.55rem .8rem;border-radius:8px;font-size:.78rem;display:none;line-height:1.5}
+.qfb.show{display:block}
+.qfb.ok{background:rgba(77,255,159,.08);border:1px solid rgba(77,255,159,.2);color:var(--success)}
+.qfb.fail{background:rgba(255,77,122,.08);border:1px solid rgba(255,77,122,.2);color:var(--error)}
+.qs{background:var(--bg2);border:1px solid var(--gold);border-radius:10px;padding:1.25rem;text-align:center;margin-top:1.25rem;display:none}
+.snum{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:var(--gold)}
+.rbtn{background:none;border:1px solid var(--border);border-radius:8px;padding:.5rem 1rem;font-family:'Space Mono',monospace;font-size:.7rem;cursor:pointer;color:var(--text-dim);margin-top:.75rem;transition:all .2s}
+.rbtn:hover{border-color:var(--text);color:var(--text)}
+
+/* ══ NOTES ═══════════════════════════════════════════════════════ */
+.na{width:100%;min-height:120px;padding:.8rem;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.875rem;line-height:1.6;resize:vertical;outline:none;transition:border-color .2s}
+.na:focus{border-color:var(--accent)}
+.na::placeholder{color:var(--text-dim)}
+.ntb{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-bottom:.65rem}
+.nsel{background:var(--input-bg);border:1px solid var(--border);border-radius:8px;padding:.38rem .65rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.825rem;outline:none;cursor:pointer}
+.abtn{background:none;border:1px solid;border-radius:8px;padding:.38rem .75rem;font-family:'Space Mono',monospace;font-size:.68rem;cursor:pointer;transition:all .2s}
+.abtn-s{border-color:var(--accent);color:var(--accent)}
+.abtn-s:hover{background:var(--accent-bg)}
+.abtn-d{border-color:var(--error);color:var(--error)}
+.abtn-d:hover{background:rgba(255,77,122,.08)}
+.snote{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.875rem;margin-bottom:.6rem}
+.snh{display:flex;justify-content:space-between;align-items:center;margin-bottom:.35rem}
+.snb{font-family:'Space Mono',monospace;font-size:.65rem}
+.snd{font-size:.7rem;color:var(--text-dim)}
+.snt{font-size:.85rem;color:var(--text-dim);line-height:1.6;white-space:pre-wrap}
+.delbtn{background:none;border:none;color:var(--error);cursor:pointer;font-size:.75rem;opacity:.6}
+.delbtn:hover{opacity:1}
+
+/* ══ GLOSSARY ════════════════════════════════════════════════════ */
+.gs{width:100%;padding:.6rem .875rem;background:var(--input-bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:.875rem;outline:none;margin-bottom:.875rem;transition:border-color .2s}
+.gs:focus{border-color:var(--accent)}
+.gs::placeholder{color:var(--text-dim)}
+.gl{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;color:var(--accent);margin:1rem 0 .4rem;padding-bottom:.2rem;border-bottom:1px solid var(--border)}
+.gt{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.7rem .875rem;margin-bottom:.35rem}
+.gtn{font-weight:600;font-size:.875rem;margin-bottom:.2rem}
+.gtd{font-size:.825rem;color:var(--text-dim);line-height:1.5}
+.gtag{font-family:'Space Mono',monospace;font-size:.6rem;padding:.1rem .35rem;border-radius:3px;margin-left:.3rem}
+
+/* ══ XP HUD ══════════════════════════════════════════════════════ */
+.xp-hud{position:fixed;bottom:70px;right:12px;z-index:9000;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:.65rem 1rem;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text);min-width:140px;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px var(--shadow)}
+.xp-hud:hover{border-color:var(--text-dim)}
+.xp-panel{position:fixed;bottom:155px;right:12px;z-index:9001;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1rem;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text);min-width:210px;display:none;box-shadow:0 8px 30px var(--shadow)}
+
+/* ══ CHAT ════════════════════════════════════════════════════════ */
+.chat-wrap{position:fixed;bottom:0;left:0;right:0;z-index:8500}
+.chat-bar{background:var(--bg);border-top:1px solid var(--border);backdrop-filter:blur(20px)}
+.chat-toggle{width:100%;background:none;border:none;border-bottom:1px solid transparent;padding:.55rem 1rem;display:flex;align-items:center;gap:.5rem;cursor:pointer;color:var(--text);font-family:'Space Mono',monospace;font-size:.65rem;transition:background .2s}
+.chat-toggle:hover{background:rgba(255,255,255,.02)}
+.ctbadge{margin-left:auto;border-radius:8px;padding:.1rem .45rem;font-size:.6rem}
+.chat-body{display:none;flex-direction:column;height:250px}
+.chat-body.open{display:flex}
+.chat-msgs{flex:1;overflow-y:auto;padding:.65rem;display:flex;flex-direction:column;gap:.4rem;scrollbar-width:thin}
+.msg-u{align-self:flex-end;background:var(--accent);color:#fff;padding:.5rem .75rem;border-radius:10px 10px 2px 10px;max-width:82%;font-size:.825rem;line-height:1.5}
+.msg-a{align-self:flex-start;background:var(--bg3);color:var(--text);padding:.5rem .75rem;border-radius:10px 10px 10px 2px;max-width:82%;font-size:.825rem;line-height:1.6;border:1px solid var(--border)}
+.msg-a.thinking{color:var(--text-dim);font-style:italic;animation:pulse 1.2s infinite}
+@keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.chat-ir{display:flex;gap:.35rem;padding:.5rem .65rem;border-top:1px solid var(--border)}
+.chat-in{flex:1;padding:.5rem .75rem;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-family:'Inter',sans-serif;font-size:.825rem;outline:none;transition:border-color .2s}
+.chat-in:focus{border-color:var(--accent)}
+.chat-in::placeholder{color:var(--text-dim)}
+.chat-send{padding:.5rem .875rem;border-radius:8px;background:var(--accent);border:none;color:#fff;font-family:'Space Mono',monospace;font-size:.65rem;cursor:pointer;transition:opacity .2s}
+.chat-send:disabled{opacity:.4;cursor:not-allowed}
+.chat-hint{padding:.3rem .65rem;font-size:.63rem;color:var(--text-dim);border-top:1px solid var(--border)}
+
+/* ══ PIZARRA ════════════════════════════════════════════════════ */
+#pz-ov{position:fixed;inset:0;z-index:10000;display:none;flex-direction:column;background:#12121e}
+#pz-tb{display:flex;align-items:center;gap:.4rem;padding:.5rem .65rem;background:#0a0a14;border-bottom:1px solid #2a2a3a;flex-wrap:wrap}
+#pz-cv{flex:1;touch-action:none;cursor:crosshair;display:block;width:100%}
+.pzbtn{background:#1e1e30;border:none;border-radius:7px;padding:.35rem .6rem;cursor:pointer;font-size:.75rem;color:#e8e8f0;font-family:'Space Mono',monospace;transition:background .2s}
+.pzbtn:hover{background:#2a2a42}
+.pzbtn.active{background:var(--accent);color:#fff}
+.pzcol{width:24px;height:24px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:border-color .2s;flex-shrink:0}
+.pzcol.active{border-color:#fff}
+.pzsep{width:1px;height:20px;background:#2a2a3a;margin:0 .1rem;flex-shrink:0}
+
+/* ══ TOAST & LEVELUP ════════════════════════════════════════════ */
+.toast{position:fixed;top:70px;right:12px;z-index:99998;background:var(--bg2);border:1px solid rgba(77,255,159,.3);border-radius:10px;padding:.55rem .875rem;font-family:'Space Mono',monospace;font-size:.7rem;color:var(--success);box-shadow:0 4px 16px var(--shadow);animation:toastIn .3s ease}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.levelup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;background:var(--bg2);border:2px solid var(--gold);border-radius:16px;padding:1.5rem 2rem;text-align:center;box-shadow:0 8px 40px rgba(255,215,0,.25);animation:toastIn .4s ease}
+
+hr{border:none;border-top:1px solid var(--border);margin:1.1rem 0}
+@media(max-width:480px){.g3{grid-template-columns:1fr 1fr}.home-grid{grid-template-columns:1fr 1fr}}
+
+/* ── RUBY EDITOR ── */
+.editor-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin:1rem 0}
+.editor-header{display:flex;align-items:center;gap:.5rem;padding:.65rem 1rem;background:var(--bg3);border-bottom:1px solid var(--border)}
+.editor-dot{width:10px;height:10px;border-radius:50%}
+.editor-title{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--text-dim);margin-left:.25rem}
+.editor-lang{margin-left:auto;font-family:'Space Mono',monospace;font-size:.65rem;color:#ff5555;background:rgba(255,85,85,.12);padding:.15rem .5rem;border-radius:5px}
+.code-editor{width:100%;min-height:130px;padding:1rem;background:#0a0d14;border:none;color:#a8b8d8;font-family:'Space Mono',monospace;font-size:.8rem;line-height:1.8;resize:vertical;outline:none;tab-size:2}
+.code-editor::placeholder{color:#3a4a5a}
+.editor-toolbar{display:flex;gap:.4rem;padding:.65rem .875rem;border-top:1px solid var(--border);flex-wrap:wrap;background:var(--bg3)}
+.ed-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:.4rem .7rem;cursor:pointer;font-family:'Space Mono',monospace;font-size:.65rem;color:var(--text-dim);transition:all .2s;white-space:nowrap}
+.ed-btn:hover{color:var(--text);border-color:var(--text-dim)}
+.ed-btn:disabled{opacity:.4;cursor:not-allowed}
+.ed-btn.run{border-color:rgba(77,255,159,.4);color:#4dff9f}
+.ed-btn.run:hover{background:rgba(77,255,159,.08)}
+.ed-btn.review{border-color:rgba(77,159,255,.4);color:#4d9fff}
+.ed-btn.review:hover{background:rgba(77,159,255,.08)}
+.ed-btn.explain{border-color:rgba(255,215,0,.4);color:#ffd700}
+.ed-btn.explain:hover{background:rgba(255,215,0,.08)}
+.ed-btn.exercise{border-color:rgba(196,122,255,.4);color:#c47aff}
+.ed-btn.exercise:hover{background:rgba(196,122,255,.08)}
+.ed-btn.quiz-btn{border-color:rgba(255,140,77,.4);color:#ff8c4d}
+.ed-btn.quiz-btn:hover{background:rgba(255,140,77,.08)}
+.editor-output{padding:1rem;font-family:'Space Mono',monospace;font-size:.78rem;line-height:1.7;color:#a8b8d8;min-height:60px;white-space:pre-wrap;border-top:1px solid var(--border);background:#070a10;display:none}
+.editor-output.show{display:block}
+.editor-output.loading{color:#8888aa;font-style:italic}
+.editor-output.error{color:#ff4d7a}
+.editor-output.ok{color:#a8b8d8}
+
+
+/* ── GENERADOR DE CLASES ── */
+.clase-box{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:1rem;margin-top:.875rem;line-height:1.7;font-size:.875rem}
+.clase-box h3{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;color:var(--accent);margin:1rem 0 .4rem}
+.clase-box h3:first-child{margin-top:0}
+.clase-box pre{background:#0a0d14;border:1px solid #1e2535;border-radius:8px;padding:.875rem;overflow-x:auto;font-family:'Space Mono',monospace;font-size:.75rem;color:#a8b8d8;margin:.5rem 0;white-space:pre-wrap}
+.clase-box p{color:var(--text-dim);margin-bottom:.5rem}
+.clase-box strong{color:var(--text)}
+.clase-box ul,.clase-box ol{padding-left:1.2rem;color:var(--text-dim);margin:.4rem 0}
+.clase-box li{margin-bottom:.25rem}
+.gen-input-wrap{display:flex;gap:.4rem;margin-bottom:.5rem}
+.gen-input{flex:1;padding:.6rem .875rem;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-family:'Inter',sans-serif;font-size:.875rem;outline:none;transition:border-color .2s}
+.gen-input:focus{border-color:var(--accent)}
+.gen-input::placeholder{color:var(--text-dim)}
+.gen-btn{padding:.6rem 1rem;border-radius:10px;background:linear-gradient(135deg,#ff5555,#c47aff);border:none;color:#fff;font-family:'Space Mono',monospace;font-size:.68rem;cursor:pointer;transition:opacity .2s;white-space:nowrap}
+.gen-btn:hover{opacity:.85}
+.gen-btn:disabled{opacity:.4;cursor:not-allowed}
+.gen-loading{color:var(--text-dim);font-family:'Space Mono',monospace;font-size:.78rem;font-style:italic;animation:pulse 1.2s infinite;padding:.5rem 0}
+.temas-rapidos{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.875rem}
+.tema-tag{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:.25rem .55rem;font-family:'Space Mono',monospace;font-size:.63rem;color:var(--text-dim);cursor:pointer;transition:all .2s}
+.tema-tag:hover{border-color:var(--accent);color:var(--accent)}
+
+
+/* ── PWA INSTALL ── */
+#pwa-banner{position:fixed;bottom:0;left:0;right:0;z-index:99997;background:linear-gradient(135deg,rgba(77,159,255,.15),rgba(196,122,255,.15));backdrop-filter:blur(20px);border-top:1px solid rgba(77,159,255,.3);padding:.75rem 1rem;display:none;align-items:center;gap:.75rem;animation:slideUp .4s ease}
+#pwa-banner.show{display:flex}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.pwa-icon{font-size:1.8rem;flex-shrink:0}
+.pwa-text{flex:1}
+.pwa-text strong{font-family:'Syne',sans-serif;font-size:.9rem;display:block;color:var(--text)}
+.pwa-text span{font-size:.75rem;color:var(--text-dim)}
+.pwa-install-btn{background:linear-gradient(135deg,#4d9fff,#c47aff);border:none;border-radius:10px;padding:.5rem 1rem;color:#fff;font-family:'Space Mono',monospace;font-size:.7rem;cursor:pointer;white-space:nowrap;transition:opacity .2s}
+.pwa-install-btn:hover{opacity:.85}
+.pwa-close-btn{background:none;border:none;color:var(--text-dim);font-size:1.1rem;cursor:pointer;padding:.2rem;flex-shrink:0}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ SPLASH ══════════════════ -->
+<div id="splash">
+  <div class="sp-grid"></div>
+  <div class="sp-glow1"></div>
+  <div class="sp-glow2"></div>
+  <div class="sp-logo">
+    <div class="sp-logo-main"><span class="d">Study</span><span class="r">OS</span></div>
+    <div class="sp-logo-sub">Tu plataforma de estudio personal</div>
+  </div>
+  <p class="sp-tagline">Elige tu módulo de estudio y empieza a aprender.<br>Con IA integrada, test, pizarra, notas y XP. 🚀</p>
+  <div class="sp-cards">
+    <div class="sp-card dsdm" onclick="launchApp('dsdm')">
+      <span class="sp-card-icon">📘</span>
+      <div class="sp-card-title">DSDM</div>
+      <div class="sp-card-desc">Desarrollo de Software Dirigido por Modelos. Bloques 1–6 completos.</div>
+      <div class="sp-card-tags">
+        <span class="sp-card-tag">MDE</span>
+        <span class="sp-card-tag">OCL</span>
+        <span class="sp-card-tag">ATL</span>
+        <span class="sp-card-tag">QVT</span>
+      </div>
+    </div>
+    <div class="sp-card ruby" onclick="launchApp('ruby')">
+      <span class="sp-card-icon">💎</span>
+      <div class="sp-card-title">Ruby</div>
+      <div class="sp-card-desc">Lenguaje de programación orientado a objetos. De cero a intermedio.</div>
+      <div class="sp-card-tags">
+        <span class="sp-card-tag">POO</span>
+        <span class="sp-card-tag">Clases</span>
+        <span class="sp-card-tag">RubyTL</span>
+      </div>
+    </div>
+  </div>
+  <div class="sp-version">StudyOS v3.0 · by Claude</div>
+</div>
+
+<!-- ══════════════════ APP ══════════════════ -->
+<div id="app">
+  <div class="topbar">
+    <button class="topbar-back" onclick="goHome()">← Inicio</button>
+    <div class="topbar-title" id="app-title"></div>
+    <div class="topbar-actions">
+      <button class="tb-btn" onclick="toggleTheme()" id="theme-btn">☀️</button>
+      <button class="tb-btn" onclick="togglePz()">🖊️</button>
+    </div>
+  </div>
+  <div class="nav-tabs" id="nav-tabs"></div>
+  <div class="content-area" id="content-area"></div>
+
+  <!-- XP HUD -->
+  <div class="xp-hud" onclick="toggleXPPanel()" id="xp-hud"></div>
+  <div class="xp-panel" id="xp-panel"></div>
+
+  <!-- CHAT -->
+  <div class="chat-wrap" id="chat-wrap" style="display:none">
+    <div class="chat-bar">
+      <button class="chat-toggle" onclick="toggleChat()">
+        <span>🤖</span><span id="chat-label">Preguntar a la IA</span>
+        <span class="ctbadge" id="chat-badge" style="background:rgba(77,159,255,.15);color:#4d9fff">cerrado</span>
+      </button>
+      <div class="chat-body" id="chat-body">
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <div class="chat-ir">
+          <input class="chat-in" id="chat-in" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" id="chat-send" onclick="sendChat()">Enviar</button>
+        </div>
+        <div class="chat-hint" id="chat-hint"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PIZARRA -->
+<div id="pz-ov">
+  <div id="pz-tb">
+    <span style="font-family:'Space Mono',monospace;font-size:.65rem;color:#8888aa">🖊️ PIZARRA</span>
+    <div class="pzsep"></div>
+    <div class="pzcol active" style="background:#ffffff" onclick="setPzColor('#ffffff',this)"></div>
+    <div class="pzcol" style="background:#4d9fff" onclick="setPzColor('#4d9fff',this)"></div>
+    <div class="pzcol" style="background:#4dff9f" onclick="setPzColor('#4dff9f',this)"></div>
+    <div class="pzcol" style="background:#ff5555" onclick="setPzColor('#ff5555',this)"></div>
+    <div class="pzcol" style="background:#ffd700" onclick="setPzColor('#ffd700',this)"></div>
+    <div class="pzcol" style="background:#c47aff" onclick="setPzColor('#c47aff',this)"></div>
+    <div class="pzsep"></div>
+    <input type="range" min="2" max="30" value="4" style="width:60px;accent-color:#4d9fff" oninput="pzSize=+this.value">
+    <div class="pzsep"></div>
+    <button class="pzbtn active" id="pz-pen" onclick="setPzTool('pen')">✏️</button>
+    <button class="pzbtn" id="pz-era" onclick="setPzTool('eraser')">⬜</button>
+    <button class="pzbtn" onclick="clearPz()">🗑</button>
+    <button class="pzbtn" onclick="savePz()">💾</button>
+    <button class="pzbtn" style="margin-left:auto;background:#8b0000" onclick="togglePz()">✕</button>
+  </div>
+  <canvas id="pz-cv"></canvas>
+</div>
+
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════════════
+// THEME
+// ══════════════════════════════════════════════════════════════════
+function toggleTheme(){
+  const h=document.documentElement,d=h.getAttribute('data-theme')==='dark';
+  h.setAttribute('data-theme',d?'light':'dark');
+  document.getElementById('theme-btn').textContent=d?'🌙':'☀️';
+  localStorage.setItem('studyos-theme',d?'light':'dark');
+}
+(()=>{
+  const t=localStorage.getItem('studyos-theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  const btn=document.getElementById('theme-btn');
+  if(btn)btn.textContent=t==='dark'?'☀️':'🌙';
+})();
+
+// ══════════════════════════════════════════════════════════════════
+// SPLASH & APP LAUNCH
+// ══════════════════════════════════════════════════════════════════
+let currentApp = null;
+
+function launchApp(app){
+  currentApp = app;
+  document.getElementById('splash').classList.add('out');
+  setTimeout(()=>{
+    document.getElementById('splash').style.display='none';
+    document.getElementById('app').style.display='flex';
+    setTimeout(()=>document.getElementById('app').classList.add('visible'),50);
+    setupApp(app);
+  },600);
+}
+
+function goHome(){
+  currentApp=null;
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('chat-wrap').style.display='none';
+  document.getElementById('xp-hud').style.display='none';
+  setTimeout(()=>{
+    document.getElementById('app').style.display='none';
+    const sp=document.getElementById('splash');
+    sp.style.display='flex';sp.classList.remove('out');
+  },400);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// XP SYSTEM
+// ══════════════════════════════════════════════════════════════════
+function getXP(app){return JSON.parse(localStorage.getItem('studyos-xp-'+app)||'{"xp":0,"level":1,"history":[]}')}
+function saveXP(app,d){localStorage.setItem('studyos-xp-'+app,JSON.stringify(d))}
+
+function addXP(amount,reason){
+  if(!currentApp)return;
+  const d=getXP(currentApp);
+  const prev=d.level;
+  d.xp+=amount;
+  d.level=Math.floor(d.xp/100)+1;
+  d.history.unshift({reason,amount,date:new Date().toLocaleDateString('es-ES')});
+  if(d.history.length>15)d.history.pop();
+  saveXP(currentApp,d);
+  updateHUD();
+  showToast('+'+amount+' XP — '+reason);
+  if(d.level>prev)showLevelUp(d.level);
+}
+
+let panelOpen=false;
+function toggleXPPanel(){panelOpen=!panelOpen;const p=document.getElementById('xp-panel');p.style.display=panelOpen?'block':'none';if(panelOpen)renderXPPanel()}
+function renderXPPanel(){
+  if(!currentApp)return;
+  const d=getXP(currentApp);
+  const pct=Math.min(100,d.xp-(d.level-1)*100);
+  const col=currentApp==='dsdm'?'#4d9fff':'#ff5555';
+  document.getElementById('xp-panel').innerHTML=`
+    <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;color:var(--gold);margin-bottom:.75rem">🏆 Perfil ${currentApp.toUpperCase()}</div>
+    <div style="margin-bottom:.3rem">Nivel <strong style="color:var(--gold);font-size:1.1rem">${d.level}</strong></div>
+    <div style="color:var(--text-dim);margin-bottom:.3rem">XP total: ${d.xp}</div>
+    <div style="background:var(--border);border-radius:3px;height:5px;margin-bottom:.65rem"><div style="background:${col};height:100%;border-radius:3px;width:${pct}%;transition:width .5s"></div></div>
+    <div style="border-top:1px solid var(--border);padding-top:.65rem;margin-top:.25rem">
+      <div style="color:var(--text-dim);margin-bottom:.4rem;font-size:.6rem">ÚLTIMAS ACCIONES</div>
+      ${d.history.slice(0,5).map(h=>`<div style="display:flex;justify-content:space-between;margin-bottom:.3rem;font-size:.6rem"><span style="color:var(--text)">${h.reason}</span><span style="color:var(--success)">+${h.amount}</span></div>`).join('')||'<div style="color:var(--text-dim);font-size:.6rem">Sin actividad aún.</div>'}
+    </div>
+  `;
+}
+
+function updateHUD(){
+  if(!currentApp)return;
+  const d=getXP(currentApp);
+  const pct=Math.min(100,d.xp-(d.level-1)*100);
+  const col=currentApp==='dsdm'?'#4d9fff':'#ff5555';
+  document.getElementById('xp-hud').innerHTML=`
+    <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.4rem">
+      <span style="color:var(--gold)">⭐</span>
+      <span>Nv <strong style="color:var(--gold)">${d.level}</strong></span>
+      <span style="color:var(--text-dim);margin-left:auto">⚡${d.xp}XP</span>
+    </div>
+    <div style="background:var(--border);border-radius:2px;height:3px"><div style="background:${col};height:100%;border-radius:2px;width:${pct}%"></div></div>
+    <div style="text-align:center;color:var(--text-dim);font-size:.55rem;margin-top:.3rem">toca para detalles</div>
+  `;
+}
+
+function showToast(msg){
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),2500);
+}
+function showLevelUp(lv){playSound('levelup');
+  const t=document.createElement('div');t.className='levelup';
+  t.innerHTML=`<div style="font-size:2rem;margin-bottom:.5rem">🏆</div><div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--gold)">¡NIVEL ${lv}!</div><div style="font-size:.8rem;color:var(--text-dim);margin-top:.3rem">Sigue así 💪</div>`;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CHAT
+// ══════════════════════════════════════════════════════════════════
+let chatOpen=false,chatHistory=[];
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chat-body').className='chat-body'+(chatOpen?' open':'');
+  const badge=document.getElementById('chat-badge');
+  badge.textContent=chatOpen?'abierto':'cerrado';
+  document.querySelector('.content-area').style.paddingBottom=chatOpen?'300px':'5rem';
+  if(chatOpen){
+    document.getElementById('chat-in').focus();
+    // Reset level on open if new session
+    if(chatHistory.length===0){userLevel='desconocido';msgCount=0;}
+  }
+}
+
+function updateLevelBadge(){
+  const badge=document.getElementById('chat-badge');
+  if(!badge||!chatOpen)return;
+  const labels={'desconocido':'abierto','principiante':'🌱 principiante','intermedio':'📚 intermedio','avanzado':'🚀 avanzado'};
+  badge.textContent=labels[userLevel]||'abierto';
+}
+function addMsg(text,type){
+  const b=document.getElementById('chat-msgs');
+  const d=document.createElement('div');d.className=type==='user'?'msg-u':'msg-a';d.textContent=text;
+  b.appendChild(d);b.scrollTop=b.scrollHeight;return d;
+}
+// Level detection keywords
+const ADVANCED_KEYWORDS = ['metamodelo','transformación','endógena','exógena','estereotipo','invariante','sintaxis abstracta','matched rule','qvt operational','ocl','mixin','lambda','yield','herencia','attr_accessor','módulo','bloque','proc','rubytl'];
+const BEGINNER_SIGNALS = ['no entiendo','no sé','qué es','para qué','cómo funciona','no me queda','explícame','ayuda'];
+
+function detectLevel(text){
+  const t = text.toLowerCase();
+  const adv = ADVANCED_KEYWORDS.filter(k => t.includes(k)).length;
+  const beg = BEGINNER_SIGNALS.filter(k => t.includes(k)).length;
+  if(adv >= 2) return 'avanzado';
+  if(beg >= 1) return 'principiante';
+  return 'intermedio';
+}
+
+let userLevel = 'desconocido';
+let msgCount = 0;
+
+async function sendChat(){
+  const inp=document.getElementById('chat-in'),btn=document.getElementById('chat-send');
+  const text=inp.value.trim();if(!text)return;
+
+  // Detect level from message
+  const detected = detectLevel(text);
+  if(detected !== 'intermedio') userLevel = detected;
+  msgCount++;
+
+  addMsg(text,'user');inp.value='';btn.disabled=true;
+  chatHistory.push({role:'user',content:text});
+  const t=addMsg('Pensando...','ai');t.classList.add('thinking');
+  const sys=currentApp==='dsdm'
+    ?'Eres un tutor experto en DSDM (Desarrollo de Software Dirigido por Modelos). El estudiante está aprendiendo: MDE, modelos, metamodelos, sintaxis abstracta y concreta, semántica, M0-M3, OCL, Perfiles MOF, herramientas (GMF, EuGENia, Xtext, DSL Tools), transformaciones M2M y M2T, ATL, QVT y lenguajes M2T. El estudiante usa analogías con Age of Empires. Explica claro, simple y con ejemplos. Usa AoE cuando puedas. Responde en español.'
+    :`Eres un tutor experto en Ruby. El estudiante aprende: variables, tipos, condicionales, bucles, arrays, hashes, métodos, clases, objetos, herencia, módulos, bloques, Procs, lambdas y RubyTL.
+
+REGLAS IMPORTANTES:
+1. ADAPTA el nivel según el usuario: si hace preguntas básicas es PRINCIPIANTE (explica paso a paso con ejemplos muy simples, evita tecnicismos). Si usa términos como "bloque", "Proc", "mixin" es AVANZADO (profundiza más).
+2. Después de cada explicación SIEMPRE haz UNA pregunta para comprobar si entendió. Ejemplos: "¿Puedes escribirme un método sencillo con lo que aprendiste?" o "¿Qué diferencia ves entre un Array y un Hash?".
+3. Si el usuario responde bien, felicítale y avanza. Si se equivoca, corrige con amabilidad y explica con otro ejemplo.
+4. Usa ejemplos de videojuegos, vida cotidiana o Age of Empires cuando puedas.
+5. Responde siempre en español. Sé cercano y motivador.`;
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,system:sys,messages:[
+          {role:'user', content:`[CONTEXTO DEL TUTOR: El estudiante lleva ${msgCount} mensajes en esta sesión. Nivel detectado: ${userLevel}. ${userLevel==='principiante'?'Usa analogías muy simples y ve paso a paso.':userLevel==='avanzado'?'Puedes usar terminología técnica y profundizar más.':'Adapta el nivel según las respuestas.'} Recuerda hacer UNA pregunta al final para comprobar comprensión.]`},
+          ...chatHistory
+        ]})});
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'No pude generar respuesta.';
+    chatHistory.push({role:'assistant',content:reply});
+    if(chatHistory.length>16)chatHistory=chatHistory.slice(-16);
+    t.remove();addMsg(reply,'ai');
+    addXP(3,'Pregunta a la IA 🤖');
+    updateLevelBadge();
+  }catch(e){t.remove();addMsg('Error conectando con la IA.','ai');}
+  btn.disabled=false;document.getElementById('chat-in').focus();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PIZARRA
+// ══════════════════════════════════════════════════════════════════
+let pzDrawing=false,pzColor='#ffffff',pzSize=4,pzTool='pen',pzLX=0,pzLY=0,pzCtx=null,pzCv=null,pzInit=false;
+function togglePz(){
+  const ov=document.getElementById('pz-ov');
+  const open=ov.style.display!=='flex';
+  ov.style.display=open?'flex':'none';
+  if(open&&!pzInit){initPz();pzInit=true;}
+}
+function initPz(){
+  pzCv=document.getElementById('pz-cv');
+  const tb=document.getElementById('pz-tb');
+  pzCv.width=window.innerWidth;
+  pzCv.height=window.innerHeight-tb.offsetHeight;
+  pzCtx=pzCv.getContext('2d');
+  pzCtx.fillStyle='#12121e';pzCtx.fillRect(0,0,pzCv.width,pzCv.height);
+  pzCtx.lineCap='round';pzCtx.lineJoin='round';
+  const draw=(x,y)=>{
+    pzCtx.lineWidth=pzTool==='eraser'?pzSize*5:pzSize;
+    pzCtx.strokeStyle=pzTool==='eraser'?'#12121e':pzColor;
+    pzCtx.beginPath();pzCtx.moveTo(pzLX,pzLY);pzCtx.lineTo(x,y);pzCtx.stroke();
+    pzLX=x;pzLY=y;
+  };
+  pzCv.onmousedown=e=>{pzDrawing=true;pzLX=e.offsetX;pzLY=e.offsetY;};
+  pzCv.onmouseup=()=>pzDrawing=false;
+  pzCv.onmouseleave=()=>pzDrawing=false;
+  pzCv.onmousemove=e=>{if(pzDrawing)draw(e.offsetX,e.offsetY);};
+  pzCv.ontouchstart=e=>{e.preventDefault();pzDrawing=true;const r=pzCv.getBoundingClientRect(),t=e.touches[0];pzLX=t.clientX-r.left;pzLY=t.clientY-r.top;};
+  pzCv.ontouchend=()=>pzDrawing=false;
+  pzCv.ontouchmove=e=>{e.preventDefault();if(!pzDrawing)return;const r=pzCv.getBoundingClientRect(),t=e.touches[0];draw(t.clientX-r.left,t.clientY-r.top);};
+}
+function setPzColor(c,el){pzColor=c;document.querySelectorAll('.pzcol').forEach(x=>x.classList.remove('active'));el.classList.add('active');setPzTool('pen');}
+function setPzTool(t){pzTool=t;document.getElementById('pz-pen').classList.toggle('active',t==='pen');document.getElementById('pz-era').classList.toggle('active',t==='eraser');}
+function clearPz(){if(pzCtx){pzCtx.fillStyle='#12121e';pzCtx.fillRect(0,0,pzCv.width,pzCv.height);}}
+function savePz(){if(!pzCv)return;const a=document.createElement('a');a.download='pizarra.png';a.href=pzCv.toDataURL();a.click();addXP(5,'Pizarra guardada 🎨');}
+
+// ══════════════════════════════════════════════════════════════════
+// PROGRESS
+// ══════════════════════════════════════════════════════════════════
+function getStudied(app){return JSON.parse(localStorage.getItem('studyos-studied-'+app)||'[]')}
+function saveStudied(app,arr){localStorage.setItem('studyos-studied-'+app,JSON.stringify(arr))}
+function toggleStudied(id){
+  const s=getStudied(currentApp);
+  const was=s.includes(id);
+  if(was){saveStudied(currentApp,s.filter(x=>x!==id));playSound('click');}
+  else{s.push(id);saveStudied(currentApp,s);addXP(50,'Bloque completado ✅');playSound('correct');}
+  renderCurrentSection();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// NOTES
+// ══════════════════════════════════════════════════════════════════
+function getNotes(app){return JSON.parse(localStorage.getItem('studyos-notes-'+app)||'[]')}
+function saveNote(app,topic){
+  const tx=document.getElementById('note-input').value.trim();if(!tx)return;
+  const ns=getNotes(app);
+  ns.unshift({id:Date.now(),topic,tx,d:new Date().toLocaleDateString('es-ES')});
+  localStorage.setItem('studyos-notes-'+app,JSON.stringify(ns));
+  document.getElementById('note-input').value='';
+  addXP(5,'Nota guardada 📝');
+  playSound('xp');
+  renderNotes(app);
+}
+function deleteNote(app,id){
+  localStorage.setItem('studyos-notes-'+app,JSON.stringify(getNotes(app).filter(n=>n.id!==id)));
+  renderNotes(app);
+}
+function renderNotes(app){
+  const el=document.getElementById('notes-list');if(!el)return;
+  const ns=getNotes(app);
+  if(!ns.length){el.innerHTML='<p style="color:var(--text-dim);font-size:.85rem">Todavía no tienes notas.</p>';return;}
+  el.innerHTML=ns.map(n=>`
+    <div class="snote">
+      <div class="snh">
+        <span class="snb" style="color:var(--accent)">${n.topic}</span>
+        <span class="snd">${n.d}</span>
+        <button class="delbtn" onclick="deleteNote('${app}',${n.id})">🗑</button>
+      </div>
+      <div class="snt">${n.tx}</div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SEARCH
+// ══════════════════════════════════════════════════════════════════
+function hl(t,q){if(!q)return t;return t.replace(new RegExp(`(${q})`,'gi'),'<span class="hm">$1</span>')}
+function doSearch(q,index){
+  const box=document.getElementById('search-results');if(!box)return;
+  if(!q.trim()){box.classList.remove('show');return;}
+  const r=index.filter(i=>i.title.toLowerCase().includes(q.toLowerCase())||i.p.toLowerCase().includes(q.toLowerCase())).slice(0,7);
+  if(!r.length){box.innerHTML='<div class="sri"><span style="font-size:.8rem;color:var(--text-dim)">Sin resultados.</span></div>';box.classList.add('show');return;}
+  box.innerHTML=r.map(x=>`<div class="sri" onclick="showSection('${x.sec}')"><span class="sri-tag">${x.tag}</span><div class="sri-title">${hl(x.title,q)}</div><div class="sri-prev">${hl(x.p.slice(0,80),q)}...</div></div>`).join('');
+  box.classList.add('show');
+}
+function hideSearch(){setTimeout(()=>{const b=document.getElementById('search-results');if(b)b.classList.remove('show');},200);}
+
+// ══════════════════════════════════════════════════════════════════
+// QUIZ ENGINE
+// ══════════════════════════════════════════════════════════════════
+let currentQuiz=[],quizAnswered=0,quizCorrect=0,shuffledQuiz=[];
+
+function buildQuiz(questions){
+  const c=document.getElementById('quiz-container');if(!c)return;
+  c.innerHTML='';quizAnswered=0;quizCorrect=0;
+  const qs=document.getElementById('quiz-score');if(qs)qs.style.display='none';
+  shuffledQuiz=[...questions].sort(()=>Math.random()-.5).map(q=>{
+    const opts=q.o.map((t,i)=>({t,ok:i===q.c}));
+    for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}
+    return{...q,o:opts.map(x=>x.t),c:opts.findIndex(x=>x.ok)};
+  });
+  shuffledQuiz.forEach((q,i)=>{
+    const d=document.createElement('div');d.className='qq';d.id='qq'+i;
+    d.innerHTML=`<div class="qn" style="color:var(--accent)">Pregunta ${i+1}</div><div class="qt">${q.q}</div><div class="opts">${q.o.map((o,j)=>`<button class="opt" onclick="answerQ(${i},${j})">${o}</button>`).join('')}</div><div class="qfb" id="qfb${i}"></div>`;
+    c.appendChild(d);
+  });
+}
+
+function answerQ(qi,chosen){
+  const q=shuffledQuiz[qi];
+  const opts=document.querySelectorAll('#qq'+qi+' .opt');
+  const fb=document.getElementById('qfb'+qi);
+  if(opts[0].disabled)return;
+  opts.forEach(o=>o.disabled=true);
+  opts[chosen].classList.add(chosen===q.c?'correct':'wrong');
+  if(chosen!==q.c)opts[q.c].classList.add('sc');
+  fb.classList.add('show');
+  if(chosen===q.c){fb.classList.add('ok');fb.textContent='✅ '+q.e;quizCorrect++;addXP(10,'Respuesta correcta 🎯');playSound('correct');}
+  else{playSound('wrong');fb.classList.add('fail');fb.textContent='❌ '+q.e;}
+  if(++quizAnswered===shuffledQuiz.length){
+    const s=document.getElementById('quiz-score');
+    if(s){s.style.display='block';document.getElementById('quiz-score-num').textContent=quizCorrect+'/'+shuffledQuiz.length;
+    const pct=Math.round(quizCorrect/shuffledQuiz.length*100);
+    document.getElementById('quiz-score-msg').textContent=pct===100?'🏆 ¡Perfecto!':pct>=80?'💪 ¡Muy bien!':pct>=60?'📚 Repasa lo que fallaste.':'🔄 Vuelve a estudiar los bloques.';
+    s.scrollIntoView({behavior:'smooth',block:'center'});}
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// GLOSSARY ENGINE
+// ══════════════════════════════════════════════════════════════════
+function buildGlossary(terms){
+  const filterAndRender=(f='')=>{
+    const cont=document.getElementById('glossary-content');if(!cont)return;
+    const fd=f?terms.filter(t=>t.t.toLowerCase().includes(f.toLowerCase())||t.d.toLowerCase().includes(f.toLowerCase())):terms;
+    if(!fd.length){cont.innerHTML='<p style="color:var(--text-dim)">Sin resultados.</p>';return;}
+    const bl={};fd.forEach(t=>{const l=t.t[0].toUpperCase();if(!bl[l])bl[l]=[];bl[l].push(t);});
+    cont.innerHTML=Object.keys(bl).sort().map(l=>`<div class="gl">${l}</div>${bl[l].map(t=>`<div class="gt"><div class="gtn">${hl(t.t,f)}<span class="gtag" style="background:var(--accent-bg);color:var(--accent)">${t.tag||''}</span></div><div class="gtd">${hl(t.d,f)}</div></div>`).join('')}`).join('');
+  };
+  filterAndRender();
+  const inp=document.getElementById('glossary-search');
+  if(inp)inp.oninput=e=>filterAndRender(e.target.value);
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SECTION ROUTER
+// ══════════════════════════════════════════════════════════════════
+let currentSection='home';
+function showSection(id){
+  document.querySelectorAll('.section-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  const panel=document.getElementById('panel-'+id);
+  const tab=document.getElementById('tab-'+id);
+  if(panel)panel.classList.add('active');
+  if(tab)tab.classList.add('active');
+  currentSection=id;
+  // trigger renders
+  if(id==='home'){mostrarFrase(currentApp);renderHome();}
+  if(id==='quiz')buildQuiz(currentApp==='dsdm'?DSDM_QUIZ:RUBY_QUIZ);
+  if(id==='glossary')buildGlossary(currentApp==='dsdm'?DSDM_GLOSSARY:RUBY_GLOSSARY);
+  if(id==='notes')renderNotes(currentApp);
+  const sr=document.getElementById('search-results');if(sr)sr.classList.remove('show');
+}
+
+function renderCurrentSection(){showSection(currentSection);}
+
+// ══════════════════════════════════════════════════════════════════
+// APP SETUP
+// ══════════════════════════════════════════════════════════════════
+function setupApp(app){
+  chatHistory=[];
+  document.getElementById('chat-msgs').innerHTML=`<div class="msg-a">${app==='dsdm'?'¡Hola! Soy tu tutor de DSDM. Pregúntame sobre metamodelos, OCL, ATL, QVT... ¿Qué quieres saber? 😊':'¡Hola! Soy tu tutor de Ruby. Pregúntame sobre variables, clases, POO, herencia, bloques... ¿Por dónde empezamos? 💎'}</div>`;
+  document.getElementById('chat-hint').textContent=app==='dsdm'?'💡 Ej: ¿Diferencia entre ATL y QVT? · ¿Qué es @pre? · Explícame OCL con AoE':'💡 Ej: ¿Diferencia entre Proc y Lambda? · ¿Cómo funciona la herencia? · ¿Qué es un mixin?';
+
+  const cfg=app==='dsdm'?DSDM_CONFIG:RUBY_CONFIG;
+  document.documentElement.style.setProperty('--accent',cfg.accent);
+  document.documentElement.style.setProperty('--accent2',cfg.accent2);
+  document.documentElement.style.setProperty('--accent-bg',cfg.accentBg);
+  document.getElementById('app-title').innerHTML=cfg.title;
+
+  // Build nav
+  const nav=document.getElementById('nav-tabs');
+  nav.innerHTML=cfg.tabs.map(t=>`<button class="nav-tab" id="tab-${t.id}" onclick="showSection('${t.id}')">${t.label}</button>`).join('');
+
+  // Build content
+  const area=document.getElementById('content-area');
+  area.innerHTML=cfg.panels.map(p=>`<div class="section-panel" id="panel-${p.id}">${p.html}</div>`).join('');
+
+  document.getElementById('chat-wrap').style.display='block';
+  document.getElementById('xp-hud').style.display='block';
+  panelOpen=false;document.getElementById('xp-panel').style.display='none';
+  updateHUD();
+  showSection('home');
+}
+
+function renderHome(){
+  const studied=getStudied(currentApp);
+  const cfg=currentApp==='dsdm'?DSDM_CONFIG:RUBY_CONFIG;
+  const grid=document.getElementById('home-items');if(!grid)return;
+  grid.innerHTML=cfg.homeCards.map(c=>`
+    <div class="hc" onclick="showSection('${c.id}')" style="border-color:${c.color}33">
+      <div class="hcn" style="color:${c.color}">${c.num} ${studied.includes(c.id)?'✅':''}</div>
+      <div class="hct" style="color:${c.color}">${c.title}</div>
+      <div class="hcd">${c.desc}</div>
+      <div class="hctags">${(c.tags||[]).map(t=>`<span class="tag" style="background:${c.color}18;color:${c.color}">${t}</span>`).join('')}</div>
+      <div class="pb"><div class="pf" style="width:${studied.includes(c.id)?100:0}%;background:${c.color}"></div></div>
+    </div>`).join('');
+  // Progress
+  const pov=document.getElementById('pov-items');if(!pov)return;
+  pov.innerHTML=cfg.homeCards.filter(c=>c.trackable).map(c=>`
+    <div class="pi">
+      <span class="pl" style="color:${c.color}">${c.title.slice(0,12)}</span>
+      <div class="pbar"><div class="pfill" style="width:${studied.includes(c.id)?100:0}%;background:${c.color}"></div></div>
+      <span class="pcheck">${studied.includes(c.id)?'✅':'⬜'}</span>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ════════════  DSDM APP CONFIG  ═══════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+const DSDM_CONFIG = {
+  accent:'#4d9fff', accent2:'#c47aff', accentBg:'rgba(77,159,255,0.08)',
+  title:'<span style="background:linear-gradient(135deg,#4d9fff,#c47aff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">📘 DSDM</span>',
+  tabs:[
+    {id:'home',label:'🏠 Inicio'},
+    {id:'b1',label:'B1·MDE'},
+    {id:'b2',label:'B2·OCL'},
+    {id:'b3',label:'B3·Perfiles'},
+    {id:'b4',label:'B4·Sintaxis'},
+    {id:'b5',label:'B5·Transform.'},
+    {id:'b6',label:'B6·ATL&QVT'},
+    {id:'quiz',label:'🎮 Test'},
+    {id:'glossary',label:'📖 Glosario'},
+    {id:'notes',label:'📝 Notas'},
+  ],
+  homeCards:[
+    {id:'b1',num:'01',title:'MDE',desc:'MDE, modelos, metamodelos, M0–M3.',tags:['MDE','Metamodelo'],color:'#4d9fff',trackable:true},
+    {id:'b2',num:'02',title:'OCL',desc:'Restricciones, derive, pre/post/@pre.',tags:['inv','@pre'],color:'#4dff9f',trackable:true},
+    {id:'b3',num:'03',title:'Perfiles MOF',desc:'Estereotipos, propiedades, restricciones.',tags:['«Barco»'],color:'#c47aff',trackable:true},
+    {id:'b4',num:'04',title:'Sintaxis Concreta',desc:'GMF, EuGENia, Xtext, DSL Tools.',tags:['GMF','Xtext'],color:'#ff8c4d',trackable:true},
+    {id:'b5',num:'05',title:'Transformaciones',desc:'M2M, M2T, endógena, exógena.',tags:['M2M','M2T'],color:'#4dffd6',trackable:true},
+    {id:'b6',num:'06',title:'ATL & QVT',desc:'Módulo, reglas, helpers, QVT.',tags:['Matched','QVT'],color:'#ff4d7a',trackable:true},
+    {id:'quiz',num:'🎮',title:'Test',desc:'24 preguntas mezcladas.',tags:[],color:'#ffd700',trackable:false},
+    {id:'glossary',num:'📖',title:'Glosario',desc:'46 términos explicados.',tags:[],color:'#4d9fff',trackable:false},
+    {id:'notes',num:'📝',title:'Notas',desc:'Tus apuntes personales.',tags:[],color:'#c47aff',trackable:false},
+  ],
+  panels:[
+    {id:'home', html:`
+      <div class="search-wrap"><span class="search-ico">🔍</span><input class="search-inp" placeholder="Buscar en DSDM..." oninput="doSearch(this.value,DSDM_SEARCH)" onblur="hideSearch()"><div class="search-results" id="search-results"></div></div>
+      <div id="frase-motivacional" style="background:linear-gradient(135deg,rgba(77,159,255,.08),rgba(196,122,255,.08));border:1px solid rgba(77,159,255,.2);border-radius:12px;padding:.875rem 1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem">
+        <span style="font-size:1.4rem" id="frase-emoji">🔥</span>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.2rem;letter-spacing:.08em">FRASE DEL DÍA</div>
+          <div style="font-size:.875rem;font-weight:500" id="frase-texto">Cargando...</div>
+        </div>
+      </div>
+      <div class="pov"><h3>📈 Tu progreso DSDM</h3><div id="pov-items"></div></div>
+      <div class="home-grid" id="home-items"></div>`},
+    {id:'b1', html:`
+      <div class="bh" style="background:rgba(77,159,255,.08);border-color:rgba(77,159,255,.3)">
+        <div class="bn" style="color:#4d9fff">01</div>
+        <div style="flex:1"><div class="bt" style="color:#4d9fff">Conceptos Básicos de MDE</div><div class="bs">MDE · Modelos · Metamodelos · M0–M3</div></div>
+        <button class="sb-btn" id="sb-b1" onclick="toggleStudied('b1')">Marcar ✓</button>
+      </div>
+      <div class="stitle">¿Qué es MDE?</div>
+      <div class="hl">En lugar de escribir código directamente, construyes <strong>MODELOS</strong> del sistema. Luego se transforman automáticamente en código. El modelo es el artefacto principal.</div>
+      <div class="yo"><p>Como el arquitecto que dibuja planos antes de construir. MDE hace lo mismo con el software.</p></div>
+      <div class="grid g3">
+        <div class="card" style="border-color:rgba(77,159,255,.2)"><div class="ct" style="color:#4d9fff">1. DSDM</div><p>Construir sistemas nuevos desde cero usando modelos.</p></div>
+        <div class="card" style="border-color:rgba(77,159,255,.2)"><div class="ct" style="color:#4d9fff">2. Modernización</div><p>Mejorar o migrar sistemas ya existentes.</p></div>
+        <div class="card" style="border-color:rgba(77,159,255,.2)"><div class="ct" style="color:#4d9fff">3. Models@Runtime</div><p>El modelo permanece activo durante la ejecución.</p></div>
+      </div>
+      <div class="stitle">Modelo, Sintaxis y Semántica</div>
+      <div class="grid g3">
+        <div class="card" style="border-color:rgba(77,159,255,.2)"><div class="ct" style="color:#4d9fff">Sintaxis Abstracta</div><p>Estructura lógica. Define QUÉ existe. Representada por el metamodelo.</p></div>
+        <div class="card" style="border-color:rgba(77,159,255,.2)"><div class="ct" style="color:#4d9fff">Sintaxis Concreta</div><p>Lo que ve el usuario: iconos, flechas. Solo indicación visual.</p></div>
+        <div class="card" style="border-color:rgba(77,159,255,.2)"><div class="ct" style="color:#4d9fff">Semántica</div><p>El significado del modelo. Sin ella es solo un dibujo.</p></div>
+      </div>
+      <div class="yo"><p>La sintaxis concreta es como un icono que indique pero no tenga peso en el juego. Solo una indicación de lo que acompaña a la semántica.</p></div>
+      <div class="stitle">Metamodelo</div>
+      <div class="hl"><strong>Metamodelo</strong> = modelo del lenguaje de modelado. Define las REGLAS. Un modelo es una instancia de su metamodelo, igual que un objeto es instancia de una clase.</div>
+      <div class="sn">⭐ Modelo es a Metamodelo = Objeto es a Clase en POO.</div>
+      <div class="stitle">Arquitectura M0–M3</div>
+      <div class="tw"><table><thead><tr><th>Nivel</th><th>Qué es</th><th>Ejemplo AoE</th></tr></thead><tbody>
+        <tr><td><strong style="color:#4d9fff">M3</strong></td><td>Reglas para crear metamodelos</td><td>Reglas universales</td></tr>
+        <tr><td><strong style="color:#4d9fff">M2</strong></td><td>Define conceptos del lenguaje</td><td>Reglas de AoE: eras, recursos</td></tr>
+        <tr><td><strong style="color:#4d9fff">M1</strong></td><td>Tu diagrama concreto</td><td>Tu partida concreta</td></tr>
+        <tr><td><strong style="color:#4d9fff">M0</strong></td><td>Sistema en ejecución</td><td>El juego corriendo</td></tr>
+      </tbody></table></div>`},
+    {id:'b2', html:`
+      <div class="bh" style="background:rgba(77,255,159,.08);border-color:rgba(77,255,159,.3)">
+        <div class="bn" style="color:#4dff9f">02</div>
+        <div style="flex:1"><div class="bt" style="color:#4dff9f">OCL — Object Constraint Language</div><div class="bs">Restricciones · derive · pre/post/@pre</div></div>
+        <button class="sb-btn" id="sb-b2" onclick="toggleStudied('b2')">Marcar ✓</button>
+      </div>
+      <div class="grid g3">
+        <div class="card" style="border-color:rgba(77,255,159,.2)"><div class="ct" style="color:#4dff9f">O = Object</div><p>Trabaja sobre objetos y conceptos del modelo.</p></div>
+        <div class="card" style="border-color:rgba(77,255,159,.2)"><div class="ct" style="color:#4dff9f">C = Constraint</div><p>Restricciones que SIEMPRE deben cumplirse.</p></div>
+        <div class="card" style="border-color:rgba(77,255,159,.2)"><div class="ct" style="color:#4dff9f">L = Language</div><p>Lenguaje formal con sintaxis precisa.</p></div>
+      </div>
+      <div class="sn">⭐ Sin OCL el metamodelo está incompleto: define QUÉ existe pero no todas las REGLAS.</div>
+      <div class="stitle">Sintaxis OCL</div>
+      <div class="cb">
+<span class="cm">-- Restricción de integridad</span>
+<span class="kw">context</span> Jugador
+<span class="kw">inv</span> recursosPositivos: self.piedra >= 0
+
+<span class="cm">-- Información derivada</span>
+<span class="kw">context</span> Jugador
+<span class="kw">derive</span> total: self.piedra + self.madera + self.oro
+
+<span class="cm">-- Operación con pre/post</span>
+<span class="kw">context</span> Jugador::construirCastillo()
+<span class="kw">pre:</span>  self.casas >= 3
+<span class="kw">post:</span> self.piedra = self.piedra@pre - 1000
+      </div>
+      <div class="yo"><p>Tenía 1001 de piedra. El castillo cuesta 1000. @pre = 1001, después me queda 1. Es la memoria del valor anterior.</p></div>`},
+    {id:'b3', html:`
+      <div class="bh" style="background:rgba(196,122,255,.08);border-color:rgba(196,122,255,.3)">
+        <div class="bn" style="color:#c47aff">03</div>
+        <div style="flex:1"><div class="bt" style="color:#c47aff">Perfiles MOF</div><div class="bs">Estereotipos · Propiedades · Restricciones</div></div>
+        <button class="sb-btn" id="sb-b3" onclick="toggleStudied('b3')">Marcar ✓</button>
+      </div>
+      <div class="hl" style="border-color:#c47aff;background:rgba(196,122,255,.06)">Perfil MOF = mecanismo para <strong>EXTENDER</strong> un metamodelo existente sin modificarlo ni reemplazarlo.</div>
+      <div class="yo"><p>Como AoE: no creo un juego nuevo para añadir barcos. Añado la expansión naval encima sin tocar las batallas terrestres.</p></div>
+      <div class="grid g3">
+        <div class="card" style="border-color:rgba(196,122,255,.2)"><div class="ct" style="color:#c47aff">1. Estereotipo «»</div><p>Etiqueta con significado nuevo. Se escribe «NombreEstereotipo». AoE: pestaña «Navíos».</p></div>
+        <div class="card" style="border-color:rgba(196,122,255,.2)"><div class="ct" style="color:#c47aff">2. Propiedades</div><p>Atributos nuevos. AoE: tripulación, habilidad pescar, capacidad de carga.</p></div>
+        <div class="card" style="border-color:rgba(196,122,255,.2)"><div class="ct" style="color:#c47aff">3. Restricciones</div><p>OCL para los nuevos elementos. AoE: barco NO puede ir a casillas de tierra.</p></div>
+      </div>`},
+    {id:'b4', html:`
+      <div class="bh" style="background:rgba(255,140,77,.08);border-color:rgba(255,140,77,.3)">
+        <div class="bn" style="color:#ff8c4d">04</div>
+        <div style="flex:1"><div class="bt" style="color:#ff8c4d">Sintaxis Concreta y Herramientas</div><div class="bs">GMF · EuGENia · Xtext · DSL Tools</div></div>
+        <button class="sb-btn" id="sb-b4" onclick="toggleStudied('b4')">Marcar ✓</button>
+      </div>
+      <div class="hl" style="border-color:#ff8c4d;background:rgba(255,140,77,.06)">Sintaxis concreta = cómo ve y usa el usuario los conceptos del modelo. No dice qué pasa. Solo dice CÓMO SE VE o CÓMO SE ESCRIBE.</div>
+      <div class="grid g2">
+        <div class="card" style="border-color:rgba(255,140,77,.2)"><div class="ct" style="color:#ff8c4d">GMF</div><p>Editor gráfico en Eclipse. <strong>Manual</strong>. AoE: construyes ladrillo por ladrillo.</p></div>
+        <div class="card" style="border-color:rgba(255,140,77,.2)"><div class="ct" style="color:#ff8c4d">EuGENia</div><p>Editor gráfico en Eclipse. <strong>Automático</strong>. AoE: le das el plano y construye sola.</p></div>
+        <div class="card" style="border-color:rgba(255,140,77,.2)"><div class="ct" style="color:#ff8c4d">Xtext</div><p>Editor <strong>textual</strong> con autocompletado. AoE: escribes 'Ob' y sugiere acciones.</p></div>
+        <div class="card" style="border-color:rgba(255,140,77,.2)"><div class="ct" style="color:#ff8c4d">DSL Tools</div><p>Editor gráfico en <strong>Visual Studio</strong>. Ecosistema Microsoft.</p></div>
+      </div>
+      <div class="sn">⭐ ¿Gráfico o textual? → ¿Eclipse o Microsoft? → GMF/EuGENia/Xtext vs DSL Tools</div>`},
+    {id:'b5', html:`
+      <div class="bh" style="background:rgba(77,255,214,.08);border-color:rgba(77,255,214,.3)">
+        <div class="bn" style="color:#4dffd6">05</div>
+        <div style="flex:1"><div class="bt" style="color:#4dffd6">Transformaciones de Modelos</div><div class="bs">M2M · M2T · Endógena · Exógena</div></div>
+        <button class="sb-btn" id="sb-b5" onclick="toggleStudied('b5')">Marcar ✓</button>
+      </div>
+      <div class="hl" style="border-color:#4dffd6;background:rgba(77,255,214,.06)">Transformación = proceso automático que toma un modelo como entrada y produce otro modelo o código como salida.</div>
+      <div class="grid g2">
+        <div class="card" style="border-color:rgba(77,255,214,.2)"><div class="ct" style="color:#4dffd6">M2M</div><p>Salida = otro modelo. AoE: guerrero espada → guerrero espada+escudo.</p></div>
+        <div class="card" style="border-color:rgba(77,255,214,.2)"><div class="ct" style="color:#4dffd6">M2T</div><p>Salida = código/texto. AoE: el informe de partida al terminar.</p></div>
+        <div class="card" style="border-color:rgba(77,255,214,.2)"><div class="ct" style="color:#4dffd6">Endógena</div><p>Mismo lenguaje. Endo = dentro. AoE→AoE.</p></div>
+        <div class="card" style="border-color:rgba(77,255,214,.2)"><div class="ct" style="color:#4dffd6">Exógena</div><p>Distinto lenguaje. Exo = fuera. AoE→Google Maps.</p></div>
+      </div>
+      <div class="yo"><p>Ambos son un mapa pero en diferentes conceptos. Uno real y otro artificial, pero siguen siendo mapas en diferentes lenguajes.</p></div>
+      <div class="tw"><table><thead><tr><th>Lenguaje</th><th>Tipo</th><th>Cómo funciona</th></tr></thead><tbody>
+        <tr><td><strong style="color:#4dffd6">ATL</strong></td><td>M2M</td><td>Busca coincidencias automáticamente.</td></tr>
+        <tr><td><strong style="color:#4dffd6">QVT</strong></td><td>M2M</td><td>Estándar oficial OMG.</td></tr>
+        <tr><td><strong style="color:#4dffd6">RubyTL</strong></td><td>M2M</td><td>ATL con sintaxis Ruby.</td></tr>
+        <tr><td><strong style="color:#4dffd6">JET/MOFScript/Xpand</strong></td><td>M2T</td><td>Plantillas con huecos.</td></tr>
+      </tbody></table></div>`},
+    {id:'b6', html:`
+      <div class="bh" style="background:rgba(255,77,122,.08);border-color:rgba(255,77,122,.3)">
+        <div class="bn" style="color:#ff4d7a">06</div>
+        <div style="flex:1"><div class="bt" style="color:#ff4d7a">ATL &amp; QVT en Detalle</div><div class="bs">Módulo · Reglas · Helpers · Matched · Lazy · Called · QVT</div></div>
+        <button class="sb-btn" id="sb-b6" onclick="toggleStudied('b6')">Marcar ✓</button>
+      </div>
+      <div class="stitle" style="color:#ff4d7a">ATL — Los 3 Elementos</div>
+      <div class="grid g3">
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Módulo</div><p>Contenedor principal. AoE: TransformacionEdificios.</p></div>
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Reglas</div><p>Cada transformación concreta. AoE: CasaMadera → CasaPiedra.</p></div>
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Helpers</div><p>Funciones reutilizables. AoE: casilla_libre(pos) → verde/rojo.</p></div>
+      </div>
+      <div class="stitle" style="color:#ff4d7a">Los 3 Tipos de Reglas</div>
+      <div class="grid g3">
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Matched</div><p>Automáticas al encontrar coincidencia. AoE: 89 chozas → las sube todas solas.</p></div>
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Lazy</div><p>Dormidas hasta que las despiertan. SÍ crean elementos. AoE: click → despierta regla.</p></div>
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Called</div><p>Las llaman pero NO crean elementos. AoE: calcula coste sin construir.</p></div>
+      </div>
+      <div class="stitle" style="color:#ff4d7a">QVT — Los 3 Componentes</div>
+      <div class="grid g3">
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Relations</div><p>Describes el QUÉ. AoE: toda Torre debe tener un Castillo.</p></div>
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Core</div><p>Motor invisible. Pantalla de humo. Nadie lo usa directamente.</p></div>
+        <div class="card" style="border-color:rgba(255,77,122,.2)"><div class="ct" style="color:#ff4d7a">Operational</div><p>Describes el CÓMO paso a paso. El más práctico.</p></div>
+      </div>
+      <div class="yo"><p>ATL busca COINCIDENCIAS automáticamente. QVT Operational le das INSTRUCCIONES exactas paso a paso.</p></div>`},
+    {id:'quiz', html:`
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.4rem">🎮 Test DSDM</h2>
+      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1.1rem">24 preguntas · respuestas mezcladas · +10 XP por acierto</p>
+      <div id="quiz-container"></div>
+      <div class="qs" id="quiz-score">
+        <div class="snum" id="quiz-score-num"></div>
+        <p id="quiz-score-msg" style="color:var(--text-dim);margin-top:.4rem"></p>
+        <button class="rbtn" onclick="buildQuiz(DSDM_QUIZ)">↺ Repetir</button>
+      </div>`},
+    {id:'glossary', html:`
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.875rem">📖 Glosario DSDM</h2>
+      <input class="gs" id="glossary-search" placeholder="Buscar término...">
+      <div id="glossary-content"></div>`},
+    {id:'notes', html:`
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.3rem">📝 Mis Notas DSDM</h2>
+      <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">Guardadas automáticamente en este dispositivo.</p>
+      <div class="ntb">
+        <select class="nsel" id="note-topic"><option>General</option><option>B1 — MDE</option><option>B2 — OCL</option><option>B3 — Perfiles</option><option>B4 — Sintaxis</option><option>B5 — Transformaciones</option><option>B6 — ATL&QVT</option></select>
+        <button class="abtn abtn-s" onclick="saveNote('dsdm',document.getElementById('note-topic').value)">💾 Guardar</button>
+        <button class="abtn abtn-d" onclick="document.getElementById('note-input').value=''">🗑 Limpiar</button>
+      </div>
+      <textarea class="na" id="note-input" placeholder="Escribe tu nota aquí..."></textarea>
+      <hr><h3 style="font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;margin-bottom:.75rem">Guardadas</h3>
+      <div id="notes-list"></div>`},
+  ]
+};
+
+// ══════════════════════════════════════════════════════════════════
+// ════════════  RUBY APP CONFIG  ═══════════════════════════════════
+// ══════════════════════════════════════════════════════════════════
+const RUBY_CONFIG = {
+  accent:'#ff5555', accent2:'#ffd700', accentBg:'rgba(255,85,85,0.08)',
+  title:'<span style="background:linear-gradient(135deg,#ff5555,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent">💎 Ruby</span>',
+  tabs:[
+    {id:'home',label:'🏠 Inicio'},
+    {id:'r1',label:'Variables'},
+    {id:'r2',label:'Control'},
+    {id:'r3',label:'Colecciones'},
+    {id:'r4',label:'Métodos'},
+    {id:'r5',label:'POO'},
+    {id:'r6',label:'RubyTL'},
+    {id:'quiz',label:'🎮 Test'},
+    {id:'glossary',label:'📖 Glosario'},
+    {id:'r7',label:'⌨️ Editor'},
+    {id:'r8',label:'📚 Clase IA'},
+    {id:'notes',label:'📝 Notas'},
+  ],
+  homeCards:[
+    {id:'r1',num:'01',title:'Variables & Datos',desc:'Tipos, variables, strings, interpolación.',tags:['Integer','String'],color:'#ff5555',trackable:true},
+    {id:'r2',num:'02',title:'Control de Flujo',desc:'if/elsif/else, unless, case/when.',tags:['if','unless'],color:'#ff8c4d',trackable:true},
+    {id:'r3',num:'03',title:'Colecciones',desc:'Arrays, hashes, iteradores map/select.',tags:['Array','Hash'],color:'#ffd700',trackable:true},
+    {id:'r4',num:'04',title:'Métodos',desc:'def/end, parámetros, return, bloques.',tags:['def','yield'],color:'#4dff9f',trackable:true},
+    {id:'r5',num:'05',title:'POO & Herencia',desc:'Clases, objetos, herencia, módulos.',tags:['class','super'],color:'#4d9fff',trackable:true},
+    {id:'r6',num:'06',title:'RubyTL en MDE',desc:'Transformaciones M2M con sintaxis Ruby.',tags:['rule','mapping'],color:'#c47aff',trackable:true},
+    {id:'quiz',num:'🎮',title:'Test Ruby',desc:'20 preguntas mezcladas.',tags:[],color:'#ffd700',trackable:false},
+    {id:'glossary',num:'📖',title:'Glosario',desc:'Términos clave de Ruby.',tags:[],color:'#ff5555',trackable:false},
+    {id:'r7',num:'⌨️',title:'Editor Ruby',desc:'Escribe código y analízalo con IA.',tags:['Revisar','Ejercicio'],color:'#4dff9f',trackable:false},
+    {id:'r8',num:'📚',title:'Clase con IA',desc:'Genera una clase completa sobre cualquier tema Ruby.',tags:['Explicación','Código','Ejercicio'],color:'#ff5555',trackable:false},
+    {id:'notes',num:'📝',title:'Notas',desc:'Tus apuntes personales.',tags:[],color:'#c47aff',trackable:false},
+  ],
+  panels:[
+    {id:'home', html:`
+      <div class="search-wrap"><span class="search-ico">🔍</span><input class="search-inp" placeholder="Buscar en Ruby..." oninput="doSearch(this.value,RUBY_SEARCH)" onblur="hideSearch()"><div class="search-results" id="search-results"></div></div>
+      <div id="frase-motivacional" style="background:linear-gradient(135deg,rgba(77,159,255,.08),rgba(196,122,255,.08));border:1px solid rgba(77,159,255,.2);border-radius:12px;padding:.875rem 1.1rem;margin-bottom:1rem;display:flex;align-items:center;gap:.75rem">
+        <span style="font-size:1.4rem" id="frase-emoji">🔥</span>
+        <div>
+          <div style="font-family:'Space Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-bottom:.2rem;letter-spacing:.08em">FRASE DEL DÍA</div>
+          <div style="font-size:.875rem;font-weight:500" id="frase-texto">Cargando...</div>
+        </div>
+      </div>
+      <div class="pov"><h3>📈 Tu progreso Ruby</h3><div id="pov-items"></div></div>
+      <div class="home-grid" id="home-items"></div>`},
+    {id:'r1', html:`
+      <div class="bh" style="background:rgba(255,85,85,.08);border-color:rgba(255,85,85,.3)">
+        <div class="bn" style="color:#ff5555">01</div>
+        <div style="flex:1"><div class="bt" style="color:#ff5555">Variables y Tipos de Datos</div><div class="bs">Integer · Float · String · Boolean · nil · Símbolos</div></div>
+        <button class="sb-btn" id="sb-r1" onclick="toggleStudied('r1')">Marcar ✓</button>
+      </div>
+      <div class="hl" style="border-color:#ff5555;background:rgba(255,85,85,.06)">Ruby es de <strong>tipado dinámico</strong>: no declaras el tipo, Ruby lo detecta solo. Convención: <strong>snake_case</strong> para variables.</div>
+      <div class="cb">
+<span class="cm"># Tipos básicos</span>
+edad     = 25          <span class="cm"># Integer</span>
+precio   = 9.99        <span class="cm"># Float</span>
+nombre   = <span class="str">'Juan'</span>    <span class="cm"># String</span>
+activo   = <span class="kw">true</span>        <span class="cm"># Boolean</span>
+vacio    = <span class="kw">nil</span>         <span class="cm"># Nil</span>
+tipo     = :guerrero   <span class="cm"># Symbol</span>
+
+<span class="cm"># Interpolación (solo con comillas dobles)</span>
+puts <span class="str">"Hola #{nombre}, tienes #{edad} años"</span>
+
+<span class="cm"># Tipos de variables</span>
+local_var   = <span class="str">'local'</span>
+@instancia  = <span class="str">'del objeto'</span>
+@@clase     = <span class="str">'compartida'</span>
+CONSTANTE   = 42
+      </div>
+      <div class="sn">⭐ Todo en Ruby es un objeto. Incluso los números y nil tienen métodos.</div>`},
+    {id:'r2', html:`
+      <div class="bh" style="background:rgba(255,140,77,.08);border-color:rgba(255,140,77,.3)">
+        <div class="bn" style="color:#ff8c4d">02</div>
+        <div style="flex:1"><div class="bt" style="color:#ff8c4d">Control de Flujo</div><div class="bs">if · elsif · else · unless · case/when · ternario</div></div>
+        <button class="sb-btn" id="sb-r2" onclick="toggleStudied('r2')">Marcar ✓</button>
+      </div>
+      <div class="cb">
+<span class="cm"># if / elsif / else</span>
+<span class="kw">if</span> vida >= 100
+  puts <span class="str">'Vida completa'</span>
+<span class="kw">elsif</span> vida >= 50
+  puts <span class="str">'Vida media'</span>
+<span class="kw">else</span>
+  puts <span class="str">'Game over'</span>
+<span class="kw">end</span>
+
+<span class="cm"># unless (contrario de if)</span>
+puts <span class="str">'El juego continúa'</span> <span class="kw">unless</span> game_over
+
+<span class="cm"># Inline</span>
+puts <span class="str">'¡Ganaste!'</span> <span class="kw">if</span> puntos >= 100
+
+<span class="cm"># Ternario</span>
+estado = vida > 0 ? <span class="str">'vivo'</span> : <span class="str">'muerto'</span>
+
+<span class="cm"># case / when</span>
+<span class="kw">case</span> edificio
+<span class="kw">when</span> <span class="str">'casa'</span>   then puts <span class="str">'50 madera'</span>
+<span class="kw">when</span> <span class="str">'castillo'</span> then puts <span class="str">'1000 piedra'</span>
+<span class="kw">else</span> puts <span class="str">'Desconocido'</span>
+<span class="kw">end</span>
+      </div>`},
+    {id:'r3', html:`
+      <div class="bh" style="background:rgba(255,215,0,.08);border-color:rgba(255,215,0,.3)">
+        <div class="bn" style="color:#ffd700">03</div>
+        <div style="flex:1"><div class="bt" style="color:#ffd700">Colecciones — Arrays y Hashes</div><div class="bs">Array · Hash · map · select · reject · reduce</div></div>
+        <button class="sb-btn" id="sb-r3" onclick="toggleStudied('r3')">Marcar ✓</button>
+      </div>
+      <div class="cb">
+<span class="cm"># Arrays</span>
+unidades = [<span class="str">'arquero'</span>, <span class="str">'caballero'</span>, <span class="str">'catapulta'</span>]
+unidades[0]     <span class="cm"># => 'arquero'</span>
+unidades.last   <span class="cm"># => 'catapulta'</span>
+unidades.push(<span class="str">'trebuchet'</span>)
+unidades.each { |u| puts u }
+
+<span class="cm"># map, select, reject</span>
+dobles  = [1,2,3].map    { |n| n * 2 }      <span class="cm"># => [2,4,6]</span>
+pares   = [1,2,3,4].select { |n| n.even? }  <span class="cm"># => [2,4]</span>
+impares = [1,2,3,4].reject { |n| n.even? }  <span class="cm"># => [1,3]</span>
+suma    = [1,2,3].reduce(0) { |t,n| t+n }    <span class="cm"># => 6</span>
+
+<span class="cm"># Hashes (diccionarios)</span>
+jugador = { nombre: <span class="str">'Juan'</span>, nivel: 5, vida: 100 }
+jugador[:nombre]  <span class="cm"># => 'Juan'</span>
+jugador[:arma] = <span class="str">'espada'</span>
+jugador.each { |k,v| puts <span class="str">"#{k}: #{v}"</span> }
+      </div>
+      <div class="sn">⭐ Los símbolos (:nombre) son más eficientes que strings como claves de hash.</div>`},
+    {id:'r4', html:`
+      <div class="bh" style="background:rgba(77,255,159,.08);border-color:rgba(77,255,159,.3)">
+        <div class="bn" style="color:#4dff9f">04</div>
+        <div style="flex:1"><div class="bt" style="color:#4dff9f">Métodos y Bloques</div><div class="bs">def · return · bloques · Procs · Lambdas</div></div>
+        <button class="sb-btn" id="sb-r4" onclick="toggleStudied('r4')">Marcar ✓</button>
+      </div>
+      <div class="cb">
+<span class="cm"># Método básico</span>
+<span class="kw">def</span> saludar(nombre, nivel = 1)
+  <span class="str">"Hola #{nombre}, nivel #{nivel}"</span>  <span class="cm"># retorno implícito</span>
+<span class="kw">end</span>
+saludar(<span class="str">'Juan'</span>)       <span class="cm"># => "Hola Juan, nivel 1"</span>
+saludar(<span class="str">'Ana'</span>, 5)    <span class="cm"># => "Hola Ana, nivel 5"</span>
+
+<span class="cm"># Bloques</span>
+[1,2,3].each <span class="kw">do</span> |n|
+  puts n * 2
+<span class="kw">end</span>
+
+<span class="cm"># yield — ejecuta el bloque que recibe</span>
+<span class="kw">def</span> dos_veces
+  yield; yield
+<span class="kw">end</span>
+dos_veces { puts <span class="str">'¡Hola!'</span> }
+
+<span class="cm"># Lambda</span>
+calcular = ->(a, b) { a + b }
+calcular.call(10, 5)  <span class="cm"># => 15</span>
+      </div>
+      <div class="sn">⭐ Convención: métodos que retornan bool usan ? al final (empty?, valid?). Los que modifican usan ! (sort!, map!).</div>`},
+    {id:'r5', html:`
+      <div class="bh" style="background:rgba(77,159,255,.08);border-color:rgba(77,159,255,.3)">
+        <div class="bn" style="color:#4d9fff">05</div>
+        <div style="flex:1"><div class="bt" style="color:#4d9fff">POO — Clases, Herencia y Módulos</div><div class="bs">class · attr_accessor · initialize · super · include</div></div>
+        <button class="sb-btn" id="sb-r5" onclick="toggleStudied('r5')">Marcar ✓</button>
+      </div>
+      <div class="cb">
+<span class="cm"># Clase base</span>
+<span class="kw">class</span> Unidad
+  attr_accessor :nombre, :vida, :ataque
+
+  <span class="kw">def</span> initialize(nombre, vida, ataque)
+    @nombre = nombre
+    @vida   = vida
+    @ataque = ataque
+  <span class="kw">end</span>
+
+  <span class="kw">def</span> atacar(objetivo)
+    objetivo.vida -= @ataque
+    puts <span class="str">"#{@nombre} ataca con #{@ataque}"</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="cm"># Herencia</span>
+<span class="kw">class</span> Arquero < Unidad
+  <span class="kw">def</span> initialize(nombre)
+    <span class="kw">super</span>(nombre, 80, 30)
+    @alcance = 10
+  <span class="kw">end</span>
+
+  <span class="kw">def</span> atacar(objetivo)   <span class="cm"># sobreescribe</span>
+    puts <span class="str">"Dispara a #{@alcance} casillas"</span>
+  <span class="kw">end</span>
+<span class="kw">end</span>
+
+<span class="cm"># Módulos (Mixins)</span>
+<span class="kw">module</span> Nadador
+  <span class="kw">def</span> nadar = puts <span class="str">"#{@nombre} nada"</span>
+<span class="kw">end</span>
+
+<span class="kw">class</span> Dragon < Unidad
+  include Nadador
+<span class="kw">end</span>
+      </div>
+      <div class="yo"><p>Herencia en Ruby es igual que los Perfiles MOF: el Arquero hereda de Unidad sin modificarla, igual que el Perfil extiende el metamodelo sin tocarlo.</p></div>`},
+    {id:'r6', html:`
+      <div class="bh" style="background:rgba(196,122,255,.08);border-color:rgba(196,122,255,.3)">
+        <div class="bn" style="color:#c47aff">06</div>
+        <div style="flex:1"><div class="bt" style="color:#c47aff">RubyTL — Ruby en MDE</div><div class="bs">Transformaciones M2M · rule · mapping · transformation</div></div>
+        <button class="sb-btn" id="sb-r6" onclick="toggleStudied('r6')">Marcar ✓</button>
+      </div>
+      <div class="hl" style="border-color:#c47aff;background:rgba(196,122,255,.06)"><strong>RubyTL</strong> = lenguaje de transformación M2M que usa la sintaxis de Ruby. Hace lo mismo que ATL pero con la gramática familiar de Ruby.</div>
+      <div class="cb">
+<span class="cm"># Transformación RubyTL</span>
+transformation CasaMadera2Piedra <span class="kw">do</span>
+
+  rule <span class="str">'CasaMaderaToCasaPiedra'</span> <span class="kw">do</span>
+    from  CasaMadera
+    to    CasaPiedra
+
+    mapping <span class="kw">do</span> |entrada, salida|
+      salida.nombre      = entrada.nombre
+      salida.material    = <span class="str">'piedra'</span>
+      salida.resistencia = entrada.resistencia * 2
+    <span class="kw">end</span>
+  <span class="kw">end</span>
+
+<span class="kw">end</span>
+      </div>
+      <div class="grid g3">
+        <div class="card" style="border-color:rgba(196,122,255,.2)"><div class="ct" style="color:#c47aff">transformation</div><p>El módulo contenedor. Equivale al Módulo ATL.</p></div>
+        <div class="card" style="border-color:rgba(196,122,255,.2)"><div class="ct" style="color:#c47aff">rule</div><p>Define qué transformar y en qué. Equivale a las Reglas ATL.</p></div>
+        <div class="card" style="border-color:rgba(196,122,255,.2)"><div class="ct" style="color:#c47aff">mapping</div><p>Cómo se mapean los atributos de entrada a salida.</p></div>
+      </div>
+      <div class="yo"><p>Si ya sabes Ruby, RubyTL te resulta natural porque usa la misma sintaxis de bloques do...end que ya conoces.</p></div>`},
+    {id:'quiz', html:`
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.4rem">🎮 Test Ruby</h2>
+      <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:1.1rem">20 preguntas · respuestas mezcladas · +10 XP por acierto</p>
+      <div id="quiz-container"></div>
+      <div class="qs" id="quiz-score">
+        <div class="snum" id="quiz-score-num"></div>
+        <p id="quiz-score-msg" style="color:var(--text-dim);margin-top:.4rem"></p>
+        <button class="rbtn" onclick="buildQuiz(RUBY_QUIZ)">↺ Repetir</button>
+      </div>`},
+    {id:'glossary', html:`
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.875rem">📖 Glosario Ruby</h2>
+      <input class="gs" id="glossary-search" placeholder="Buscar término...">
+      <div id="glossary-content"></div>`},
+    {id:'r7', html:`
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.3rem">⌨️ Editor Ruby con IA</h2>
+      <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">Escribe código Ruby y usa la IA para analizarlo, explicarlo o practicar.</p>
+      <div class="editor-wrap">
+        <div class="editor-header">
+          <div class="editor-dot" style="background:#ff5f57"></div>
+          <div class="editor-dot" style="background:#febc2e"></div>
+          <div class="editor-dot" style="background:#28c840"></div>
+          <span class="editor-title">editor.rb</span>
+          <span class="editor-lang">Ruby</span>
+        </div>
+        <textarea class="code-editor" id="ruby-editor" placeholder="# Escribe tu código Ruby aquí...
+# Ejemplo:
+class Unidad
+  def initialize(nombre)
+    @nombre = nombre
+  end
+  def saludar
+    puts 'Hola, soy ' + @nombre
+  end
+end
+
+u = Unidad.new('Arquero')
+u.saludar"></textarea>
+        <div class="editor-toolbar">
+          <button class="ed-btn run" onclick="editorAction('run')">▶️ Simular</button>
+          <button class="ed-btn review" onclick="editorAction('review')">🧠 Revisar</button>
+          <button class="ed-btn explain" onclick="editorAction('explain')">📖 Explicar</button>
+          <button class="ed-btn exercise" onclick="editorAction('exercise')">📚 Ejercicio</button>
+          <button class="ed-btn quiz-btn" onclick="editorAction('quiz')">❓ Quiz</button>
+          <button class="ed-btn" onclick="clearEditor()" style="margin-left:auto">🗑 Limpiar</button>
+        </div>
+        <pre class="editor-output" id="editor-output"></pre>
+      </div>
+      <div class="sn" style="margin-top:.5rem">💡 El código no se ejecuta en el navegador, pero la IA puede revisarlo, explicarlo y sugerirte ejercicios.</div>`},
+    {id:'r8', html:`
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.3rem">📚 Generador de Clases con IA</h2>
+      <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">Escribe un tema y la IA genera una clase completa con explicación, código y ejercicio.</p>
+      <div class="temas-rapidos" id="temas-rapidos">
+        <span class="tema-tag" onclick="setTema('variables en Ruby')">variables</span>
+        <span class="tema-tag" onclick="setTema('arrays y sus métodos')">arrays</span>
+        <span class="tema-tag" onclick="setTema('hashes en Ruby')">hashes</span>
+        <span class="tema-tag" onclick="setTema('clases y objetos en Ruby')">clases</span>
+        <span class="tema-tag" onclick="setTema('herencia en Ruby')">herencia</span>
+        <span class="tema-tag" onclick="setTema('bloques y yield en Ruby')">bloques</span>
+        <span class="tema-tag" onclick="setTema('módulos y mixins en Ruby')">módulos</span>
+        <span class="tema-tag" onclick="setTema('manejo de errores en Ruby')">errores</span>
+        <span class="tema-tag" onclick="setTema('iteradores map select reject')">iteradores</span>
+        <span class="tema-tag" onclick="setTema('lambdas y procs en Ruby')">lambdas</span>
+        <span class="tema-tag" onclick="setTema('RubyTL transformaciones MDE')">RubyTL</span>
+      </div>
+      <div class="gen-input-wrap">
+        <input class="gen-input" id="tema-clase" placeholder="Ej: herencia en Ruby, arrays, bloques...">
+        <button class="gen-btn" id="gen-btn" onclick="generarClase()">✨ Generar clase</button>
+      </div>
+      <div id="clase-output"></div>`},
+    {id:'notes', html:`
+      <h2 style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:700;margin-bottom:.3rem">📝 Mis Notas Ruby</h2>
+      <p style="color:var(--text-dim);font-size:.82rem;margin-bottom:1rem">Guardadas automáticamente en este dispositivo.</p>
+      <div class="ntb">
+        <select class="nsel" id="note-topic"><option>General</option><option>Variables</option><option>Control de Flujo</option><option>Colecciones</option><option>Métodos</option><option>POO</option><option>RubyTL</option></select>
+        <button class="abtn abtn-s" onclick="saveNote('ruby',document.getElementById('note-topic').value)">💾 Guardar</button>
+        <button class="abtn abtn-d" onclick="document.getElementById('note-input').value=''">🗑 Limpiar</button>
+      </div>
+      <textarea class="na" id="note-input" placeholder="Escribe tu nota aquí..."></textarea>
+      <hr><h3 style="font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;margin-bottom:.75rem">Guardadas</h3>
+      <div id="notes-list"></div>`},
+  ]
+};
+
+// ══════════════════════════════════════════════════════════════════
+// QUIZ DATA
+// ══════════════════════════════════════════════════════════════════
+const DSDM_QUIZ=[
+  {q:'¿Qué es MDE?',o:['Un lenguaje de programación','Un paradigma donde los modelos son el artefacto principal','Una herramienta de diseño','Un tipo de base de datos'],c:1,e:'MDE propone construir modelos primero y transformarlos en código. El modelo es el artefacto principal.'},
+  {q:'¿Qué diferencia hay entre sintaxis abstracta y concreta?',o:['Son lo mismo','La abstracta es la estructura lógica y la concreta es lo que ve el usuario','La abstracta es más fácil','La concreta define las reglas'],c:1,e:'Abstracta = QUÉ existe (metamodelo). Concreta = cómo se ve o escribe para el usuario.'},
+  {q:'¿Qué es M0 en la arquitectura de 4 niveles?',o:['El metamodelo','El sistema real en ejecución','El diagrama UML','Las reglas para crear metamodelos'],c:1,e:'M0 es la realidad: el juego corriendo, el aldeano recogiendo piedra.'},
+  {q:'¿Qué relación hay entre modelo y metamodelo?',o:['El metamodelo es simplificación del modelo','Un modelo es instancia de su metamodelo (como objeto-clase en POO)','Son independientes','El modelo contiene al metamodelo'],c:1,e:'Modelo es a Metamodelo = Objeto es a Clase. Sin metamodelo no existe el modelo.'},
+  {q:'¿Qué significa la C en OCL?',o:['Class','Constraint (restricción)','Code','Context'],c:1,e:'C = Constraint. Condiciones que SIEMPRE deben cumplirse.'},
+  {q:'¿Para qué sirve "derive" en OCL?',o:['Definir una restricción','Calcular automáticamente un valor','Describir qué pasa antes','Eliminar elementos'],c:1,e:'derive calcula automáticamente. NO es una restricción.'},
+  {q:'¿Qué significa @pre en OCL?',o:['Una precondición','El valor que tenía una variable ANTES de ejecutar','Una restricción','El contexto'],c:1,e:'@pre = la memoria del valor anterior a la operación.'},
+  {q:'¿Qué es un Perfil MOF?',o:['Un metamodelo nuevo desde cero','Un mecanismo para EXTENDER un metamodelo sin modificarlo','Una restricción OCL','Una transformación M2M'],c:1,e:'El Perfil MOF añade conceptos nuevos sin tocar lo original.'},
+  {q:'¿Qué es un estereotipo en un Perfil MOF?',o:['Una restricción','Una etiqueta especial que da significado nuevo. Se escribe «Nombre»','Una transformación','Una propiedad'],c:1,e:'El estereotipo se escribe «NombreEstereotipo» y da significado nuevo a un concepto.'},
+  {q:'¿Qué diferencia hay entre sintaxis concreta y semántica?',o:['Son lo mismo','Concreta = CÓMO SE VE. Semántica = el SIGNIFICADO','La semántica es más visual','La concreta define las reglas'],c:1,e:'Concreta = el icono que ves. Semántica = qué significa ese icono.'},
+  {q:'¿Qué herramienta usarías en Eclipse para que el usuario DIBUJE?',o:['Xtext','DSL Tools','GMF o EuGENia','MOFScript'],c:2,e:'GMF y EuGENia crean editores gráficos en Eclipse.'},
+  {q:'¿Qué diferencia hay entre GMF y EuGENia?',o:['GMF es textual','Los dos crean editores gráficos en Eclipse: GMF manual, EuGENia automático','EuGENia es más antiguo','GMF usa Microsoft'],c:1,e:'Mismo resultado, diferente esfuerzo. GMF = manual. EuGENia = automático con anotaciones.'},
+  {q:'¿Qué produce una transformación M2T?',o:['Otro modelo','Código o texto ejecutable','Un metamodelo','Una restricción OCL'],c:1,e:'M2T = Modelo a Texto. Resultado = código, SQL, XML o cualquier texto.'},
+  {q:'¿Qué es una transformación endógena?',o:['Entre modelos de distintos lenguajes','Entre modelos del MISMO lenguaje','Una que produce código','Una manual'],c:1,e:'Endógena = mismo lenguaje. Endo = dentro.'},
+  {q:'¿Qué son los Helpers en ATL?',o:['Reglas automáticas','Funciones reutilizables que todas las reglas pueden usar','El módulo principal','Reglas que no crean elementos'],c:1,e:'Helpers = funciones escritas una vez y usadas por todas las reglas.'},
+  {q:'¿Qué diferencia hay entre Lazy Rules y Called Rules?',o:['Son iguales','Lazy crea elementos cuando la despiertan. Called no crea, solo calcula','Called se ejecuta automáticamente','Lazy nunca se ejecuta'],c:1,e:'Lazy = la despiertan y SÍ crea. Called = la llaman pero NO crea.'},
+  {q:'¿Qué es QVT Core?',o:['El más práctico de QVT','La base matemática interna que nadie usa directamente','El estándar oficial','Las relaciones'],c:1,e:'QVT Core = pantalla de humo. Motor invisible que nadie usa directamente.'},
+  {q:'Diferencia clave ATL vs QVT Operational:',o:['ATL es más moderno','ATL busca COINCIDENCIAS. QVT Operational = INSTRUCCIONES exactas','QVT Op es para M2T','Son iguales'],c:1,e:'ATL = guardia que patrulla solo. QVT Op = trabajador con órdenes exactas.'},
+  {q:'El informe al finalizar una partida de AoE sería:',o:['M2M endógena','M2M exógena','M2T','Una restricción OCL'],c:2,e:'El modelo de la partida → texto (el informe). Eso es M2T.'},
+  {q:'¿Cuándo usarías un Metamodelo nuevo en lugar de un Perfil MOF?',o:['Siempre','Cuando el dominio es tan diferente que UML no aporta nada útil','Cuando tienes poco tiempo','Cuando quieres estereotipos'],c:1,e:'Si el cambio es tan abrupto que el lenguaje base no aporta nada.'},
+  {q:'¿Para qué sirven JET, MOFScript y Xpand?',o:['Para M2M','Para editores gráficos','Para generar código con plantillas (M2T)','Para metamodelos'],c:2,e:'Los tres son M2T: plantillas con huecos que se rellenan con datos del modelo.'},
+  {q:'¿Qué es M2 en la arquitectura de niveles?',o:['El sistema real','Los modelos del usuario','Los metamodelos que definen los lenguajes','El meta-metamodelo (MOF)'],c:2,e:'M2 = los metamodelos concretos, como el metamodelo de UML con Clase, Atributo, Asociación.'},
+  {q:'¿Qué son las Matched Rules en ATL?',o:['Reglas que no crean elementos','Reglas dormidas que esperan ser llamadas','Reglas que se ejecutan automáticamente al encontrar coincidencia','El módulo principal'],c:2,e:'Matched Rules = automáticas al encontrar coincidencia. Como un detector.'},
+  {q:'¿Qué herramienta de sintaxis concreta usa Visual Studio?',o:['GMF','EuGENia','Xtext','DSL Tools'],c:3,e:'DSL Tools es la herramienta de Microsoft para crear editores gráficos en Visual Studio.'},
+];
+
+const RUBY_QUIZ=[
+  {q:'¿Cuál es el tipo de dato para texto en Ruby?',o:['Text','String','Char','Word'],c:1,e:'String es el tipo para texto. Se escribe entre comillas simples o dobles.'},
+  {q:'¿Qué hace "unless" en Ruby?',o:['Es igual que if','Ejecuta el código si la condición es FALSA (contrario de if)','Ejecuta el código siempre','Repite el código'],c:1,e:'Unless = contrario de if. Ejecuta si la condición es falsa.'},
+  {q:'¿Qué hace el método .map en un array?',o:['Filtra elementos','Elimina duplicados','Transforma cada elemento devolviendo un nuevo array','Ordena el array'],c:2,e:'map transforma cada elemento y devuelve un nuevo array con los resultados.'},
+  {q:'¿Qué significa @ antes de una variable en Ruby?',o:['Es una constante','Es una variable de instancia (del objeto)','Es una variable global','Es un símbolo'],c:1,e:'@variable = variable de instancia. Disponible en todos los métodos del objeto.'},
+  {q:'¿Cómo se define un método en Ruby?',o:['function nombre()','def nombre ... end','method nombre:','fun nombre()'],c:1,e:'En Ruby los métodos se definen con def y terminan con end.'},
+  {q:'¿Qué hace "yield" en un método?',o:['Retorna el método','Ejecuta el bloque que recibe el método','Para el programa','Imprime en pantalla'],c:1,e:'yield ejecuta el bloque que se pasó al método cuando se llamó.'},
+  {q:'¿Cómo se hace herencia en Ruby?',o:['class Hijo extends Padre','class Hijo < Padre','class Hijo(Padre)','class Hijo : Padre'],c:1,e:'En Ruby la herencia se indica con < . class Arquero < Unidad.'},
+  {q:'¿Qué hace "super" en Ruby?',o:['Crea un objeto superior','Llama al método del mismo nombre de la clase padre','Destruye el objeto','Crea una nueva clase'],c:1,e:'super llama al método del mismo nombre en la clase padre.'},
+  {q:'¿Qué es un Hash en Ruby?',o:['Una función de seguridad','Un tipo de array ordenado','Una colección de pares clave-valor','Un método especial'],c:2,e:'Hash = diccionario. Pares clave:valor. Se usan símbolos como claves.'},
+  {q:'¿Qué hace .select en un array?',o:['Selecciona el primer elemento','Filtra elementos que cumplen la condición','Ordena el array','Elimina duplicados'],c:1,e:'select filtra y devuelve solo los elementos que cumplen la condición del bloque.'},
+  {q:'¿Qué hace attr_accessor en una clase?',o:['Define el constructor','Crea automáticamente getter y setter para la variable','Hereda de otra clase','Incluye un módulo'],c:1,e:'attr_accessor crea getter y setter automáticamente. Evita escribirlos manualmente.'},
+  {q:'¿Qué es un Símbolo en Ruby?',o:[':nombre — un identificador inmutable y eficiente','Una variable especial','Un método sin parámetros','Un tipo de string largo'],c:0,e:'Los símbolos (:nombre) son identificadores inmutables. Más eficientes que strings como claves de hash.'},
+  {q:'¿Cuál es la diferencia entre Proc y Lambda?',o:['Son iguales','Lambda verifica número de argumentos y tiene su propio return. Proc no.','Proc es más moderno','Lambda no puede recibir argumentos'],c:1,e:'Lambda es más estricta: verifica args y tiene su propio return. Proc es más flexible.'},
+  {q:'¿Qué hace include en una clase?',o:['Hereda de otra clase','Incluye los métodos de un módulo (Mixin)','Importa un archivo','Crea una instancia'],c:1,e:'include añade los métodos de un módulo a la clase. Alternativa a la herencia múltiple.'},
+  {q:'¿Cómo se interpola una variable en un string?',o:['Con ${variable}','Con #{variable} en comillas dobles','Con %variable%','Con {{variable}}'],c:1,e:'La interpolación usa #{} y solo funciona con comillas dobles.'},
+  {q:'¿Qué hace .reduce en un array?',o:['Reduce el tamaño del array','Acumula un resultado aplicando una operación a todos los elementos','Elimina el último elemento','Convierte a string'],c:1,e:'reduce acumula un resultado. Ej: [1,2,3].reduce(0){|t,n| t+n} => 6.'},
+  {q:'¿Qué convención se usa para métodos que retornan booleano?',o:['Empiezan con is_','Terminan con ?','Empiezan con check_','Terminan con _bool'],c:1,e:'Convención Ruby: métodos que retornan true/false terminan con ? (empty?, valid?, include?).'},
+  {q:'¿Para qué sirve RubyTL en MDE?',o:['Para crear interfaces gráficas','Para escribir transformaciones M2M usando sintaxis Ruby','Para generar metamodelos','Para definir restricciones OCL'],c:1,e:'RubyTL = ATL pero escrito en Ruby. Transformaciones M2M con la gramática familiar de Ruby.'},
+  {q:'¿Qué hace "times" en Ruby?',o:['Mide el tiempo','Repite un bloque N veces','Multiplica arrays','Cuenta elementos'],c:1,e:'5.times { ... } repite el bloque exactamente 5 veces.'},
+  {q:'¿Qué es nil en Ruby?',o:['El número 0','Falso','La ausencia de valor (equivalente a null)','Un string vacío'],c:2,e:'nil representa la ausencia de valor. Es un objeto en Ruby (NilClass).'},
+];
+
+// ══════════════════════════════════════════════════════════════════
+// GLOSSARIES
+// ══════════════════════════════════════════════════════════════════
+const DSDM_GLOSSARY=[
+  {t:'@pre',d:'En OCL, el valor que tenía una variable ANTES de ejecutar la operación.',tag:'OCL'},
+  {t:'ATL',d:'Atlas Transformation Language. Lenguaje M2M que busca coincidencias automáticamente.',tag:'B6'},
+  {t:'Called Rules',d:'Tipo de regla ATL que NO crea elementos. Solo calcula o ejecuta acciones.',tag:'B6'},
+  {t:'context',d:'Palabra clave OCL que indica sobre qué clase aplica la restricción.',tag:'OCL'},
+  {t:'derive',d:'Palabra clave OCL para calcular automáticamente. NO es una restricción.',tag:'OCL'},
+  {t:'DSL',d:'Domain-Specific Language. Lenguaje Específico del Dominio.',tag:'B1'},
+  {t:'DSL Tools',d:'Herramienta Microsoft para editores gráficos en Visual Studio.',tag:'B4'},
+  {t:'Endógena',d:'Transformación M2M entre modelos del MISMO lenguaje.',tag:'B5'},
+  {t:'Estereotipo',d:'En un Perfil MOF, etiqueta especial «Nombre» que da significado nuevo.',tag:'B3'},
+  {t:'EuGENia',d:'Genera editores gráficos en Eclipse automáticamente con anotaciones.',tag:'B4'},
+  {t:'Exógena',d:'Transformación M2M entre modelos de DISTINTO lenguaje.',tag:'B5'},
+  {t:'GMF',d:'Graphical Modeling Framework. Editor gráfico en Eclipse, configurado manualmente.',tag:'B4'},
+  {t:'Helper',d:'En ATL, función reutilizable que todas las reglas pueden usar.',tag:'B6'},
+  {t:'inv',d:'Invariante en OCL. Condición que SIEMPRE debe cumplirse.',tag:'OCL'},
+  {t:'JET',d:'Java Emitter Templates. Lenguaje M2T con plantillas estilo JSP.',tag:'B5'},
+  {t:'Lazy Rules',d:'Tipo de regla ATL dormida hasta que otra la despierta. SÍ crea elementos.',tag:'B6'},
+  {t:'M0',d:'Sistema real en ejecución. Objetos concretos en memoria.',tag:'B1'},
+  {t:'M2M',d:'Modelo a Modelo. Transformación donde la salida es otro modelo.',tag:'B5'},
+  {t:'M2T',d:'Modelo a Texto. Transformación donde la salida es código o texto ejecutable.',tag:'B5'},
+  {t:'Matched Rules',d:'Tipo de regla ATL que se ejecuta automáticamente al encontrar coincidencia.',tag:'B6'},
+  {t:'MDE',d:'Model-Driven Engineering. Los modelos son el artefacto principal del desarrollo.',tag:'B1'},
+  {t:'Metamodelo',d:'Modelo del lenguaje de modelado. Define las reglas. Un modelo es instancia suya.',tag:'B1'},
+  {t:'MOF',d:'Meta-Object Facility. El meta-metamodelo (M3). Estándar del OMG.',tag:'B1'},
+  {t:'OCL',d:'Object Constraint Language. Lenguaje para añadir restricciones al metamodelo.',tag:'B2'},
+  {t:'Perfil MOF',d:'Mecanismo para extender un metamodelo existente sin modificarlo.',tag:'B3'},
+  {t:'post:',d:'En OCL, describe el estado DESPUÉS de ejecutar una operación.',tag:'OCL'},
+  {t:'pre:',d:'En OCL, condición que debe cumplirse ANTES de ejecutar una operación.',tag:'OCL'},
+  {t:'QVT Core',d:'Base matemática interna de QVT. Nadie lo usa directamente. Motor invisible.',tag:'B6'},
+  {t:'QVT Operational',d:'Componente de QVT donde describes el CÓMO paso a paso. El más práctico.',tag:'B6'},
+  {t:'QVT Relations',d:'Componente de QVT donde describes el QUÉ debe corresponder.',tag:'B6'},
+  {t:'RubyTL',d:'Lenguaje M2M que usa la sintaxis de Ruby. Como ATL pero en Ruby.',tag:'B5'},
+  {t:'self',d:'En OCL, referencia al propio objeto sobre el que aplica la restricción.',tag:'OCL'},
+  {t:'Sintaxis Abstracta',d:'Estructura lógica del modelo. Se describe con el metamodelo.',tag:'B1'},
+  {t:'Sintaxis Concreta',d:'Cómo se ve o escribe el modelo. Puede ser gráfica o textual.',tag:'B4'},
+  {t:'Transformación',d:'Proceso automático que convierte un modelo en otro modelo o código.',tag:'B5'},
+  {t:'Xpand',d:'Lenguaje M2T. El más potente, permite plantillas complejas y reutilizables.',tag:'B5'},
+  {t:'Xtext',d:'Genera editores textuales en Eclipse con autocompletado y detección de errores.',tag:'B4'},
+];
+
+const RUBY_GLOSSARY=[
+  {t:'Array',d:'Colección ordenada de elementos. Puede contener tipos mezclados.',tag:'Colecciones'},
+  {t:'attr_accessor',d:'Crea automáticamente getter y setter para variables de instancia.',tag:'POO'},
+  {t:'attr_reader',d:'Crea solo el getter (solo lectura) para una variable de instancia.',tag:'POO'},
+  {t:'Bloque',d:'Trozo de código que se pasa a un método. Se escribe con do...end o { }.',tag:'Métodos'},
+  {t:'Boolean',d:'Tipo de dato que solo puede ser true o false.',tag:'Variables'},
+  {t:'class',d:'Palabra clave para definir una clase en Ruby.',tag:'POO'},
+  {t:'def',d:'Palabra clave para definir un método en Ruby.',tag:'Métodos'},
+  {t:'each',d:'Iterador que recorre todos los elementos de una colección.',tag:'Colecciones'},
+  {t:'end',d:'Cierra un bloque, método, clase o condicional en Ruby.',tag:'Sintaxis'},
+  {t:'Float',d:'Número con parte decimal. Ej: 9.99, -3.14.',tag:'Variables'},
+  {t:'Hash',d:'Colección de pares clave-valor. Como un diccionario.',tag:'Colecciones'},
+  {t:'if / elsif / else',d:'Estructura condicional en Ruby. Termina con end.',tag:'Control'},
+  {t:'include',d:'Incluye los métodos de un módulo en una clase (Mixin).',tag:'POO'},
+  {t:'initialize',d:'Método constructor en Ruby. Se ejecuta al crear un objeto con .new.',tag:'POO'},
+  {t:'Integer',d:'Número entero sin parte decimal. Ej: 25, -10, 0.',tag:'Variables'},
+  {t:'Lambda',d:'Función anónima. Verifica número de argumentos y tiene su propio return.',tag:'Métodos'},
+  {t:'map',d:'Itera sobre un array transformando cada elemento. Devuelve un nuevo array.',tag:'Colecciones'},
+  {t:'Módulo',d:'Contenedor de métodos que se puede incluir en clases (Mixin). No instanciable.',tag:'POO'},
+  {t:'nil',d:'Representa la ausencia de valor. Equivale a null en otros lenguajes.',tag:'Variables'},
+  {t:'Proc',d:'Bloque guardado en una variable. Más flexible que Lambda.',tag:'Métodos'},
+  {t:'reduce',d:'Acumula un resultado aplicando una operación a todos los elementos del array.',tag:'Colecciones'},
+  {t:'reject',d:'Filtra un array eliminando los elementos que cumplen la condición.',tag:'Colecciones'},
+  {t:'RubyTL',d:'Lenguaje de transformación M2M que usa la sintaxis de Ruby.',tag:'MDE'},
+  {t:'select',d:'Filtra un array devolviendo solo los elementos que cumplen la condición.',tag:'Colecciones'},
+  {t:'self',d:'Referencia al objeto actual dentro de un método o clase.',tag:'POO'},
+  {t:'String',d:'Tipo de dato para texto. Se escribe entre comillas simples o dobles.',tag:'Variables'},
+  {t:'super',d:'Llama al método del mismo nombre de la clase padre.',tag:'POO'},
+  {t:'Símbolo',d:'Identificador inmutable precedido por : . Más eficiente que String como clave.',tag:'Variables'},
+  {t:'times',d:'Repite un bloque N veces. Ej: 5.times { puts "hola" }.',tag:'Control'},
+  {t:'unless',d:'Contrario de if. Ejecuta el código si la condición es FALSA.',tag:'Control'},
+  {t:'yield',d:'Ejecuta el bloque que recibió el método.',tag:'Métodos'},
+];
+
+// ══════════════════════════════════════════════════════════════════
+// SEARCH INDEXES
+// ══════════════════════════════════════════════════════════════════
+const DSDM_SEARCH=[
+  {title:'MDE',tag:'B1',p:'Paradigma donde los modelos son el artefacto principal del desarrollo.',sec:'b1'},
+  {title:'Metamodelo',tag:'B1',p:'Modelo del lenguaje de modelado. Un modelo es instancia de su metamodelo.',sec:'b1'},
+  {title:'Sintaxis Abstracta',tag:'B1',p:'Estructura lógica del modelo, representada por el metamodelo.',sec:'b1'},
+  {title:'M0-M3',tag:'B1',p:'Arquitectura de 4 niveles: real, modelo, metamodelo, meta-metamodelo.',sec:'b1'},
+  {title:'OCL',tag:'B2',p:'Object Constraint Language. Añade restricciones precisas al metamodelo.',sec:'b2'},
+  {title:'inv / derive / @pre',tag:'B2',p:'Palabras clave de OCL para restricciones, cálculo derivado y valores anteriores.',sec:'b2'},
+  {title:'Perfil MOF',tag:'B3',p:'Extender un metamodelo existente sin modificarlo ni reemplazarlo.',sec:'b3'},
+  {title:'Estereotipo',tag:'B3',p:'Etiqueta especial «Nombre» que da significado nuevo a un concepto.',sec:'b3'},
+  {title:'GMF / EuGENia',tag:'B4',p:'Herramientas para crear editores gráficos en Eclipse.',sec:'b4'},
+  {title:'Xtext',tag:'B4',p:'Herramienta para crear editores textuales con autocompletado en Eclipse.',sec:'b4'},
+  {title:'M2M / M2T',tag:'B5',p:'Tipos de transformación. M2M produce modelo, M2T produce código.',sec:'b5'},
+  {title:'ATL',tag:'B6',p:'Atlas Transformation Language. Busca coincidencias automáticamente.',sec:'b6'},
+  {title:'QVT Relations / Operational',tag:'B6',p:'QVT Relations = QUÉ. QVT Operational = CÓMO paso a paso.',sec:'b6'},
+  {title:'Matched / Lazy / Called Rules',tag:'B6',p:'Tipos de reglas ATL con diferentes formas de ejecutarse.',sec:'b6'},
+];
+
+const RUBY_SEARCH=[
+  {title:'Variables y tipos',tag:'R1',p:'Integer, Float, String, Boolean, nil, Símbolo. Tipado dinámico.',sec:'r1'},
+  {title:'if / unless / case',tag:'R2',p:'Estructuras de control de flujo en Ruby.',sec:'r2'},
+  {title:'Array / Hash / map / select',tag:'R3',p:'Colecciones y sus métodos de iteración.',sec:'r3'},
+  {title:'def / yield / Bloques',tag:'R4',p:'Definición de métodos y uso de bloques en Ruby.',sec:'r4'},
+  {title:'class / initialize / attr_accessor',tag:'R5',p:'Programación orientada a objetos en Ruby.',sec:'r5'},
+  {title:'Herencia y módulos',tag:'R5',p:'class Hijo < Padre. include Modulo. super.',sec:'r5'},
+  {title:'RubyTL',tag:'R6',p:'Transformaciones M2M usando la sintaxis de Ruby.',sec:'r6'},
+];
+
+// ══════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════
+
+// ══ RUBY EDITOR ══
+async function editorAction(action){
+  const code = document.getElementById('ruby-editor')?.value?.trim() || '';
+  const out = document.getElementById('editor-output');
+  if(!out) return;
+  out.className = 'editor-output show loading';
+
+  const prompts = {
+    run: code
+      ? `Simula la ejecución de este código Ruby y muestra qué imprimiría paso a paso:\n\n${code}\n\nFormato: muestra la salida esperada y explica brevemente cada paso. Si hay errores, indícalos.`
+      : 'Dame un ejemplo simple de código Ruby con su salida esperada.',
+    review: code
+      ? `Revisa este código Ruby. Señala errores, mejoras y buenas prácticas:\n\n${code}`
+      : 'Dame un consejo de buenas prácticas en Ruby.',
+    explain: code
+      ? `Explica este código Ruby de forma simple y didáctica, línea por línea si es necesario:\n\n${code}`
+      : 'Explica cómo funciona una clase en Ruby con un ejemplo.',
+    exercise: `Dame un ejercicio práctico de Ruby${code ? ' relacionado con este código:\n'+code : ''}. Incluye: descripción del problema, pistas y solución completa.`,
+    quiz: `Genera una pregunta tipo test de Ruby con 4 opciones (A, B, C, D), indica la respuesta correcta y explica por qué. ${code ? 'Basada en este código: '+code : 'Nivel intermedio.'}`
+  };
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body: JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:800,
+        system:'Eres un tutor experto en Ruby. Responde siempre en español de forma clara, didáctica y concisa. Usa ejemplos prácticos.',
+        messages:[{role:'user', content: prompts[action]}]
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Sin respuesta.';
+    out.className = 'editor-output show ok';
+    out.textContent = reply;
+    addXP(5, 'Editor Ruby usado ⌨️');
+  } catch(e) {
+    out.className = 'editor-output show error';
+    out.textContent = '❌ Error conectando con la IA. Inténtalo de nuevo.';
+  }
+}
+
+function clearEditor(){
+  const ed = document.getElementById('ruby-editor');
+  const out = document.getElementById('editor-output');
+  if(ed) ed.value = '';
+  if(out){out.className='editor-output';out.textContent='';}
+}
+
+// ══ GENERADOR DE CLASES ══
+function setTema(t){
+  const inp=document.getElementById('tema-clase');
+  if(inp){inp.value=t;inp.focus();}
+}
+
+async function generarClase(){
+  const inp=document.getElementById('tema-clase');
+  const out=document.getElementById('clase-output');
+  const btn=document.getElementById('gen-btn');
+  if(!inp||!out)return;
+  const tema=inp.value.trim();
+  if(!tema)return;
+
+  btn.disabled=true;
+  out.innerHTML='<div class="gen-loading">✨ Generando tu clase sobre "'+tema+'"...</div>';
+  playSound('click');
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1200,
+        system:`Eres un profesor experto en Ruby. Crea una clase completa y didáctica con esta estructura EXACTA usando Markdown:
+
+## 📌 [Título del tema]
+
+## 🧠 Explicación
+Explica el concepto paso a paso. Empieza simple (para principiantes) y añade detalle progresivo.
+
+## 💻 Ejemplo de código
+Incluye un ejemplo Ruby claro, comentado línea por línea.
+
+## 🔍 Explicación del código
+Explica qué hace cada parte.
+
+## 📝 Ejercicio práctico
+Propón un ejercicio con dos niveles: uno básico y uno más avanzado.
+
+## ❓ Pregunta de comprobación
+Haz UNA pregunta concreta para que el estudiante verifique si entendió el concepto.
+
+## 💡 Consejo pro
+Da un consejo útil o buena práctica.
+
+Usa lenguaje simple y ejemplos cotidianos. Responde siempre en español.`,
+        messages:[{role:'user',content:'Crea una clase completa sobre: '+tema}]
+      })
+    });
+    const data=await res.json();
+    let texto=data.content?.[0]?.text||'Error generando la clase.';
+
+    // Format markdown to HTML safely
+    function fmtMd(t){
+      t = t.replace(/```[a-zA-Z0-9]*[\r\n]([\s\S]*?)```/g, '<pre>$1</pre>');
+      t = t.replace(/^## ([^\n]+)/gm, '<h3>$1</h3>');
+      t = t.replace(/^### ([^\n]+)/gm, '<h4 style="color:var(--text);margin:.5rem 0 .25rem;font-size:.9rem">$1</h4>');
+      t = t.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      t = t.replace(/`([^`]+)`/g, '<code style="background:var(--bg3);padding:.1rem .3rem;border-radius:4px;font-family:monospace;font-size:.8rem">$1</code>');
+      t = t.replace(/^[-*] ([^\n]+)/gm, '<li>$1</li>');
+      t = t.replace(/\n\n/g, '</p><p>');
+      t = t.replace(/\n/g, '<br>');
+      return t;
+    }
+    texto = fmtMd(texto);
+    out.innerHTML='<div class="clase-box"><p>'+texto+'</p></div>';
+    addXP(20,'Clase generada 📚');
+    playSound('correct');
+  }catch(e){
+    out.innerHTML='<div style="color:var(--error);font-size:.85rem;padding:.5rem">❌ Error conectando con la IA. Inténtalo de nuevo.</div>';
+    playSound('wrong');
+  }
+  btn.disabled=false;
+}
+
+// ══ FRASES MOTIVACIONALES ══
+const FRASES = {
+  dsdm: [
+    { e:'🔥', t:'Los metamodelos no te van a estudiar solos. ¡Vamos!' },
+    { e:'💪', t:'Cada bloque que completas te acerca al 10.' },
+    { e:'🚀', t:'MDE es difícil, pero tú eres más difícil.' },
+    { e:'⭐', t:'Hoy entiendes algo que ayer no entendías. Eso es crecer.' },
+    { e:'🎯', t:'ATL, QVT, OCL... los tienes todos dominados.' },
+    { e:'🏆', t:'Age of Empires + DSDM = combo ganador.' },
+    { e:'💡', t:'Un metamodelo a la vez. Vas a llegar.' },
+    { e:'⚡', t:'El que estudia hoy, aprueba mañana.' },
+    { e:'🎮', t:'Si puedes entender AoE, puedes entender cualquier cosa.' },
+    { e:'🧠', t:'Tu cerebro ya sabe más de lo que crees.' },
+  ],
+  ruby: [
+    { e:'💎', t:'Ruby es elegante. Tú también lo serás.' },
+    { e:'🔥', t:'Cada línea de código que escribes te hace mejor.' },
+    { e:'🚀', t:'De variables a clases. Vas a dominarlo todo.' },
+    { e:'💪', t:'La POO no es difícil, es un rompecabezas que ya estás armando.' },
+    { e:'⭐', t:'Matz diseñó Ruby para hacerte feliz. Aprovéchalo.' },
+    { e:'🏆', t:'Un método a la vez. Llegarás lejos.' },
+    { e:'💡', t:'Hoy entiendes bloques. Mañana, lambdas. Pasado, el mundo.' },
+    { e:'⚡', t:'El código más bonito está en Ruby. Y tú lo estás aprendiendo.' },
+    { e:'🎯', t:'Herencia, módulos, clases... casi lo tienes todo.' },
+    { e:'🧠', t:'Programa, equivócate, aprende. Eso es Ruby.' },
+  ]
+};
+
+function mostrarFrase(app){
+  const frases = FRASES[app] || FRASES.dsdm;
+  const f = frases[Math.floor(Math.random() * frases.length)];
+  const emoji = document.getElementById('frase-emoji');
+  const texto = document.getElementById('frase-texto');
+  if(emoji) emoji.textContent = f.e;
+  if(texto) texto.textContent = f.t;
+}
+
+// ══ SONIDO ══
+let audioCtx = null;
+function playSound(type = 'click'){
+  try {
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    const sounds = {
+      click:    { freq:800,  dur:0.06, type:'sine'    },
+      correct:  { freq:1200, dur:0.15, type:'sine'    },
+      wrong:    { freq:200,  dur:0.18, type:'sawtooth' },
+      levelup:  { freq:1500, dur:0.4,  type:'sine'    },
+      xp:       { freq:1000, dur:0.08, type:'triangle' },
+    };
+    const s = sounds[type] || sounds.click;
+    osc.frequency.setValueAtTime(s.freq, audioCtx.currentTime);
+    if(type === 'levelup'){
+      osc.frequency.linearRampToValueAtTime(2000, audioCtx.currentTime + 0.2);
+    }
+    osc.type = s.type;
+    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + s.dur);
+    osc.start(audioCtx.currentTime);
+    osc.stop(audioCtx.currentTime + s.dur);
+  } catch(e){}
+}
+
+// ══ PWA ══
+let deferredPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show banner after 3 seconds
+  setTimeout(() => {
+    if(!localStorage.getItem('pwa-dismissed')) {
+      document.getElementById('pwa-banner').classList.add('show');
+    }
+  }, 3000);
+});
+
+async function installPWA() {
+  if(deferredPrompt) {
+    deferredPrompt.prompt();
+    const result = await deferredPrompt.userChoice;
+    if(result.outcome === 'accepted') {
+      showToast('✅ ¡App instalada correctamente!');
+      addXP && addXP(100, 'App instalada 📲');
+    }
+    deferredPrompt = null;
+    dismissBanner();
+  } else {
+    // Fallback instructions
+    showInstallInstructions();
+  }
+}
+
+function dismissBanner() {
+  document.getElementById('pwa-banner').classList.remove('show');
+  localStorage.setItem('pwa-dismissed', '1');
+}
+
+function showInstallInstructions() {
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isAndroid = /Android/.test(navigator.userAgent);
+  let msg = '';
+  if(isIOS) {
+    msg = '📱 En Safari: toca el botón compartir ⬆️ y luego "Añadir a pantalla de inicio"';
+  } else if(isAndroid) {
+    msg = '📱 En Chrome: toca el menú ⋮ y luego "Añadir a pantalla de inicio" o "Instalar app"';
+  } else {
+    msg = '💻 En Chrome: toca el icono ⊕ en la barra de direcciones para instalar';
+  }
+  // Show as toast
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:99999;background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.25rem 1.5rem;text-align:center;max-width:280px;box-shadow:0 8px 40px var(--shadow);font-size:.875rem;line-height:1.6;color:var(--text)';
+  t.innerHTML = msg + '<br><br><button onclick="this.parentElement.remove()" style="background:var(--accent);border:none;border-radius:8px;padding:.4rem .875rem;color:#fff;font-family:Space Mono,monospace;font-size:.7rem;cursor:pointer">Entendido</button>';
+  document.body.appendChild(t);
+}
+
+// Service Worker para funcionar offline
+if('serviceWorker' in navigator) {
+  const swCode = `
+    const CACHE = 'studyos-v1';
+    const ASSETS = ['.'];
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+    });
+    self.addEventListener('fetch', e => {
+      e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).catch(() => caches.match('.')))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type: 'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(() => {});
+}
+
+window.addEventListener('appinstalled', () => {
+  showToast('🎉 StudyOS instalada en tu móvil');
+  dismissBanner();
+});
+
+if(localStorage.getItem('studyos-visited')){
+  // Auto-skip splash
+}
+localStorage.setItem('studyos-visited','1');
+</script>
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwa-banner">
+  <span class="pwa-icon">📲</span>
+  <div class="pwa-text">
+    <strong>Instalar StudyOS</strong>
+    <span>Añade la app a tu pantalla de inicio</span>
+  </div>
+  <button class="pwa-install-btn" onclick="installPWA()">Instalar</button>
+  <button class="pwa-close-btn" onclick="dismissBanner()">✕</button>
+</div>
+
+</body>
+</html>
